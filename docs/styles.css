@@ -171,6 +171,57 @@ h1 {
   filter: drop-shadow(0 30px 38px rgba(29, 75, 170, 0.24));
 }
 
+.hero-art.pillow-fight {
+  isolation: isolate;
+}
+
+.hero-art.pillow-fight::before {
+  width: 96%;
+  background: rgba(93, 177, 255, 0.3);
+}
+
+.hero-art.pillow-fight img {
+  grid-area: 1 / 1;
+  width: min(112%, 520px);
+  max-width: none;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 34px;
+  box-shadow: 0 28px 55px rgba(29, 75, 170, 0.2);
+  filter: none;
+  transform: rotate(1.5deg);
+  animation:
+    pillow-fight-float 5s ease-in-out infinite,
+    pillow-fight-crossfade 20s ease-in-out infinite;
+}
+
+.hero-art.pillow-fight img:nth-child(2) {
+  animation-delay: 0s, -10s;
+}
+
+@keyframes pillow-fight-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(1.5deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+}
+
+@keyframes pillow-fight-crossfade {
+  0%,
+  45%,
+  100% {
+    opacity: 1;
+  }
+
+  50%,
+  95% {
+    opacity: 0;
+  }
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -286,11 +337,29 @@ footer {
     width: min(74vw, 330px);
   }
 
+  .hero-art.pillow-fight img {
+    width: min(100%, 520px);
+  }
+
   .cards {
     grid-template-columns: 1fr;
   }
 
   .card p {
     min-height: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-art.pillow-fight img {
+    animation: none;
+  }
+
+  .hero-art.pillow-fight img:nth-child(2) {
+    opacity: 0;
   }
 }
