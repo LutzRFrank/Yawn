@@ -271,7 +271,7 @@
 				DEVELOPMENT_TEAM = F26768E8SW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Yawn;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -296,7 +296,7 @@
 				DEVELOPMENT_TEAM = F26768E8SW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Yawn;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -322,7 +322,7 @@
 				DEVELOPMENT_TEAM = F26768E8SW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Yawn;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.lutzfrank.Yawn;
 				MARKETING_VERSION = 1.0;
@@ -347,7 +347,7 @@
 				DEVELOPMENT_TEAM = F26768E8SW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Yawn;
+				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.lutzfrank.Yawn;
 				MARKETING_VERSION = 1.0;

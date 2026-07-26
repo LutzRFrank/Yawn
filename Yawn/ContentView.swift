@@ -196,6 +196,12 @@ private struct WelcomeView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+
+                    Link(
+                        "Datenschutzerklärung",
+                        destination: URL(string: "https://lutzrfrank.github.io/Yawn/privacy.html")!
+                    )
+                    .font(.footnote.weight(.semibold))
                 }
                 .padding(24)
             }
