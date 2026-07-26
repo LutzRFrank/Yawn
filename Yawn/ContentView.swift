@@ -127,12 +127,12 @@ struct ContentView: View {
 }
 
 private struct MorningSceneChoice {
-    let showsAlternate: Bool
+    let variant: Int
     let showsLady: Bool
 
     static func random() -> Self {
         Self(
-            showsAlternate: Bool.random(),
+            variant: Int.random(in: 0..<4),
             showsLady: Int.random(in: 0..<10) == 0
         )
     }
@@ -142,13 +142,15 @@ private struct MorningSceneChoice {
             return "SceneLadyJump"
         }
 
-        guard showsAlternate else { return nil }
-
         return switch state {
-        case .exhausted: "SceneExhaustedSlide"
-        case .restless: "SceneRestlessPillow"
-        case .okay: "SceneOkayStretch"
-        case .refreshed: "SceneRefreshedJump"
+        case .exhausted:
+            [nil, "SceneExhaustedSlide", "SceneExhaustedHidden", "SceneExhaustedEdgeSit"][variant]
+        case .restless:
+            [nil, "SceneRestlessPillow", "SceneRestlessTangle", "SceneRestlessPillowHug"][variant]
+        case .okay:
+            [nil, "SceneOkayStretch", "SceneOkayMakeBed", "SceneOkayWave"][variant]
+        case .refreshed:
+            [nil, "SceneRefreshedJump", "SceneRefreshedVictory", "SceneRefreshedCape"][variant]
         }
     }
 }
