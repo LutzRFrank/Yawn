@@ -51,15 +51,15 @@ struct ContentView: View {
                             color: .indigo
                         )
                         SleepMetricCard(
-                            title: "Effizienz",
-                            value: "\(displayedSleep.efficiencyPoints)/30",
-                            detail: "\(displayedSleep.awakeDurationText) wach",
+                            title: "Bettzeit",
+                            value: "\(displayedSleep.bedtimePoints)/30",
+                            detail: displayedSleep.bedtimeText,
                             color: .cyan
                         )
                         SleepMetricCard(
-                            title: "Erholung",
-                            value: "\(displayedSleep.restorationPoints)/20",
-                            detail: displayedSleep.restorativeShareText,
+                            title: "Ruhe",
+                            value: "\(displayedSleep.interruptionPoints)/20",
+                            detail: displayedSleep.interruptionText,
                             color: .orange
                         )
                     }

@@ -47,13 +47,39 @@ struct SleepSummary: Sendable {
 }
 
 enum SleepScore {
-    static func summary(total: TimeInterval, awake: TimeInterval, deep: TimeInterval, rem: TimeInterval) -> SleepSummary {
-        guard total > 0 else { return SleepSummary(score: 0, bedState: .exhausted) }
-        let hours = total / 3600
-        let duration = max(0, 1 - abs(hours - 8) / 4) * 50
-        let efficiency = min(max((total / max(total + awake, 1) - 0.65) / 0.3, 0), 1) * 30
-        let stages = min(((deep + rem) / total) / 0.35, 1) * 20
-        let score = min(100, max(0, Int((duration + efficiency + stages).rounded())))
+    static func summary(
+        totalSleep: TimeInterval,
+        bedtimeConsistency: TimeInterval,
+        awake: TimeInterval,
+        interruptionCount: Int
+    ) -> SleepSummary {
+        guard totalSleep > 0 else {
+            return SleepSummary(score: 0, bedState: .exhausted)
+        }
+
+        let hours = totalSleep / 3600
+        let durationQuality: Double
+        if hours < 7 + 5.0 / 6 {
+            durationQuality = max(0, hours / (7 + 5.0 / 6))
+        } else if hours > 9 {
+            durationQuality = max(0, (12 - hours) / 3)
+        } else {
+            durationQuality = 1
+        }
+        let duration = durationQuality * 50
+
+        let deviationMinutes = max(0, bedtimeConsistency / 60)
+        let timing = max(0, 1 - deviationMinutes / 57) * 30
+
+        let awakeMinutes = max(0, awake / 60)
+        let durationPenalty = awakeMinutes / 11
+        let countPenalty = Double(max(0, interruptionCount - 1)) * 0.5
+        let interruptions = max(0, 20 - durationPenalty - countPenalty)
+
+        let score = min(
+            100,
+            max(0, Int((duration + timing + interruptions).rounded()))
+        )
         let state: BedState = score >= 85 ? .refreshed : score >= 70 ? .okay : score >= 50 ? .restless : .exhausted
         return SleepSummary(score: score, bedState: state)
     }

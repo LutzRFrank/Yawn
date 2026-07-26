@@ -37,36 +37,34 @@ enum BedState: Int, CaseIterable, Sendable {
 struct SleepSummary: Sendable {
     let score: Int
     let totalSleep: TimeInterval
+    let bedtime: Date
+    let bedtimeConsistency: TimeInterval
     let awake: TimeInterval
-    let deep: TimeInterval
-    let rem: TimeInterval
+    let interruptionCount: Int
 
     var durationPoints: Int {
-        let hours = totalSleep / 3600
-        return Int((max(0, 1 - abs(hours - 8) / 4) * 50).rounded())
+        SleepScore.durationPoints(totalSleep: totalSleep)
     }
 
-    var efficiencyPoints: Int {
-        let efficiency = totalSleep / max(totalSleep + awake, 1)
-        return Int((min(max((efficiency - 0.65) / 0.3, 0), 1) * 30).rounded())
+    var bedtimePoints: Int {
+        SleepScore.bedtimePoints(consistency: bedtimeConsistency)
     }
 
-    var restorationPoints: Int {
-        guard totalSleep > 0 else { return 0 }
-        return Int((min(((deep + rem) / totalSleep) / 0.35, 1) * 20).rounded())
+    var interruptionPoints: Int {
+        SleepScore.interruptionPoints(awake: awake, count: interruptionCount)
     }
 
     var sleepDurationText: String {
         Self.durationText(totalSleep)
     }
 
-    var awakeDurationText: String {
-        Self.durationText(awake)
+    var bedtimeText: String {
+        bedtime.formatted(date: .omitted, time: .shortened)
     }
 
-    var restorativeShareText: String {
-        guard totalSleep > 0 else { return "0 %" }
-        return "\(Int((((deep + rem) / totalSleep) * 100).rounded())) %"
+    var interruptionText: String {
+        let times = interruptionCount == 1 ? "1×" : "\(interruptionCount)×"
+        return "\(times) · \(Self.durationText(awake))"
     }
 
     var bedAssetName: String {
@@ -87,20 +85,31 @@ struct SleepSummary: Sendable {
     }
 
     static let placeholder = SleepSummary(
-        score: 82,
+        score: 84,
         totalSleep: 7.5 * 3600,
+        bedtime: previewBedtime(hour: 23, minute: 10),
+        bedtimeConsistency: 30 * 60,
         awake: 25 * 60,
-        deep: 70 * 60,
-        rem: 100 * 60
+        interruptionCount: 2
     )
 
     static let poorPreview = SleepSummary(
-        score: 38,
+        score: 30,
         totalSleep: 4.75 * 3600,
+        bedtime: previewBedtime(hour: 2, minute: 5),
+        bedtimeConsistency: 2 * 3600,
         awake: 95 * 60,
-        deep: 32 * 60,
-        rem: 44 * 60
+        interruptionCount: 7
     )
+
+    private static func previewBedtime(hour: Int, minute: Int) -> Date {
+        Calendar.current.date(
+            bySettingHour: hour,
+            minute: minute,
+            second: 0,
+            of: .now
+        ) ?? .now
+    }
 
     private static func durationText(_ duration: TimeInterval) -> String {
         let minutes = max(0, Int((duration / 60).rounded()))
@@ -113,19 +122,46 @@ struct SleepSummary: Sendable {
 enum SleepScore {
     static func calculate(
         totalSleep: TimeInterval,
+        bedtimeConsistency: TimeInterval,
         awake: TimeInterval,
-        deep: TimeInterval,
-        rem: TimeInterval
+        interruptionCount: Int
     ) -> Int {
         guard totalSleep > 0 else { return 0 }
 
-        let summary = SleepSummary(
-            score: 0,
-            totalSleep: totalSleep,
-            awake: awake,
-            deep: deep,
-            rem: rem
+        return min(
+            100,
+            max(
+                0,
+                durationPoints(totalSleep: totalSleep)
+                    + bedtimePoints(consistency: bedtimeConsistency)
+                    + interruptionPoints(awake: awake, count: interruptionCount)
+            )
         )
-        return min(100, max(0, summary.durationPoints + summary.efficiencyPoints + summary.restorationPoints))
+    }
+
+    static func durationPoints(totalSleep: TimeInterval) -> Int {
+        let hours = totalSleep / 3600
+        let quality: Double
+        if hours < 7 + 5.0 / 6 {
+            quality = max(0, hours / (7 + 5.0 / 6))
+        } else if hours > 9 {
+            quality = max(0, (12 - hours) / 3)
+        } else {
+            quality = 1
+        }
+        return Int((quality * 50).rounded())
+    }
+
+    static func bedtimePoints(consistency: TimeInterval) -> Int {
+        let deviationMinutes = max(0, consistency / 60)
+        let quality = max(0, 1 - deviationMinutes / 57)
+        return Int((quality * 30).rounded())
+    }
+
+    static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
+        let awakeMinutes = max(0, awake / 60)
+        let durationPenalty = awakeMinutes / 11
+        let countPenalty = Double(max(0, count - 1)) * 0.5
+        return Int(max(0, 20 - durationPenalty - countPenalty).rounded())
     }
 }
