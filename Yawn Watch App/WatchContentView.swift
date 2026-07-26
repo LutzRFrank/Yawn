@@ -2,20 +2,11 @@ import SwiftUI
 
 struct WatchContentView: View {
     @State private var sleep = SleepSummary.placeholder
+    @State private var sceneChoice = WatchMorningSceneChoice.random()
 
     var body: some View {
         VStack(spacing: 2) {
-            ZStack(alignment: .bottomLeading) {
-                Image(sleep.bedAssetName)
-                    .resizable()
-                    .scaledToFit()
-
-                Image(sleep.bedState.characterAssetName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 88)
-                    .offset(x: -4, y: 10)
-            }
+            WatchMorningSceneView(sleep: sleep, choice: sceneChoice)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(sleep.bedState.accessibilityLabel)
 
@@ -32,6 +23,58 @@ struct WatchContentView: View {
         .task {
             if let summary = try? await SleepHealthStore.shared.latestNight() {
                 sleep = summary
+            }
+        }
+    }
+}
+
+private struct WatchMorningSceneChoice {
+    let showsAlternate: Bool
+    let showsLady: Bool
+
+    static func random() -> Self {
+        Self(
+            showsAlternate: Bool.random(),
+            showsLady: Int.random(in: 0..<10) == 0
+        )
+    }
+
+    func sceneAssetName(for state: BedState) -> String? {
+        if showsLady, state == .refreshed {
+            return "SceneLadyJump"
+        }
+
+        guard showsAlternate else { return nil }
+
+        return switch state {
+        case .exhausted: "SceneExhaustedSlide"
+        case .restless: "SceneRestlessPillow"
+        case .okay: "SceneOkayStretch"
+        case .refreshed: "SceneRefreshedJump"
+        }
+    }
+}
+
+private struct WatchMorningSceneView: View {
+    let sleep: SleepSummary
+    let choice: WatchMorningSceneChoice
+
+    var body: some View {
+        if let sceneAssetName = choice.sceneAssetName(for: sleep.bedState) {
+            Image(sceneAssetName)
+                .resizable()
+                .scaledToFit()
+        } else {
+            ZStack(alignment: .bottomLeading) {
+                Image(sleep.bedAssetName)
+                    .resizable()
+                    .scaledToFit()
+
+                Image(sleep.bedState.characterAssetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 88)
+                    .offset(x: -4, y: 10)
             }
         }
     }

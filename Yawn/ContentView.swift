@@ -4,6 +4,7 @@ struct ContentView: View {
     @State private var sleep = SleepSummary.placeholder
     @State private var healthMessage: String?
     @State private var showsWelcome = false
+    @State private var sceneChoice = MorningSceneChoice.random()
     @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
 #if DEBUG
     @State private var showsPoorPreview = true
@@ -26,17 +27,10 @@ struct ContentView: View {
                 VStack(spacing: 18) {
                     Spacer()
 
-                    ZStack(alignment: .bottomLeading) {
-                        Image(displayedSleep.bedAssetName)
-                            .resizable()
-                            .scaledToFit()
-
-                        Image(displayedSleep.bedState.characterAssetName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 220)
-                            .offset(x: -2, y: 28)
-                    }
+                    MorningSceneView(
+                        sleep: displayedSleep,
+                        choice: sceneChoice
+                    )
                     .contentTransition(.opacity)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(displayedSleep.bedState.accessibilityLabel)
@@ -127,6 +121,58 @@ struct ContentView: View {
             WelcomeView {
                 hasSeenWelcome = true
                 showsWelcome = false
+            }
+        }
+    }
+}
+
+private struct MorningSceneChoice {
+    let showsAlternate: Bool
+    let showsLady: Bool
+
+    static func random() -> Self {
+        Self(
+            showsAlternate: Bool.random(),
+            showsLady: Int.random(in: 0..<10) == 0
+        )
+    }
+
+    func sceneAssetName(for state: BedState) -> String? {
+        if showsLady, state == .refreshed {
+            return "SceneLadyJump"
+        }
+
+        guard showsAlternate else { return nil }
+
+        return switch state {
+        case .exhausted: "SceneExhaustedSlide"
+        case .restless: "SceneRestlessPillow"
+        case .okay: "SceneOkayStretch"
+        case .refreshed: "SceneRefreshedJump"
+        }
+    }
+}
+
+private struct MorningSceneView: View {
+    let sleep: SleepSummary
+    let choice: MorningSceneChoice
+
+    var body: some View {
+        if let sceneAssetName = choice.sceneAssetName(for: sleep.bedState) {
+            Image(sceneAssetName)
+                .resizable()
+                .scaledToFit()
+        } else {
+            ZStack(alignment: .bottomLeading) {
+                Image(sleep.bedAssetName)
+                    .resizable()
+                    .scaledToFit()
+
+                Image(sleep.bedState.characterAssetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 220)
+                    .offset(x: -2, y: 28)
             }
         }
     }
