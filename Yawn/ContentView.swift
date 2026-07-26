@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var sleep = SleepSummary.placeholder
     @State private var healthMessage: String?
     @State private var showsWelcome = false
@@ -115,6 +116,11 @@ struct ContentView: View {
         .onAppear {
             if !hasSeenWelcome {
                 showsWelcome = true
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                sceneChoice = .random()
             }
         }
         .sheet(isPresented: $showsWelcome) {

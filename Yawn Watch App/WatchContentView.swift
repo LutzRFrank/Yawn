@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WatchContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @State private var sleep = SleepSummary.placeholder
     @State private var sceneChoice = WatchMorningSceneChoice.random()
 
@@ -23,6 +24,11 @@ struct WatchContentView: View {
         .task {
             if let summary = try? await SleepHealthStore.shared.latestNight() {
                 sleep = summary
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                sceneChoice = .random()
             }
         }
     }
