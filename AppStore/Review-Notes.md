@@ -8,6 +8,13 @@ sleep duration, efficiency, and restorative stages. Health data never leaves
 the user’s device. The app has no account, server, analytics, advertising, or
 tracking.
 
+Version 1.1 adds multiple visual scene variants for every Yawn Score category.
+Whenever the iPhone or Apple Watch app becomes active, it randomly selects one
+illustration from the category matching the calculated score. A rare Lil’
+Finder Lady scene may also appear. This variation is entirely visual and does
+not change the score, its category, its underlying HealthKit data, or HealthKit
+access.
+
 To review:
 
 1. Launch Yawn Sleep on iPhone.
