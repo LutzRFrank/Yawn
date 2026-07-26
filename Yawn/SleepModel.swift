@@ -94,6 +94,14 @@ struct SleepSummary: Sendable {
         rem: 100 * 60
     )
 
+    static let poorPreview = SleepSummary(
+        score: 38,
+        totalSleep: 4.75 * 3600,
+        awake: 95 * 60,
+        deep: 32 * 60,
+        rem: 44 * 60
+    )
+
     private static func durationText(_ duration: TimeInterval) -> String {
         let minutes = max(0, Int((duration / 60).rounded()))
         let hours = minutes / 60

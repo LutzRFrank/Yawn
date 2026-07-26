@@ -3,69 +3,112 @@ import SwiftUI
 struct ContentView: View {
     @State private var sleep = SleepSummary.placeholder
     @State private var healthMessage: String?
+    @State private var showsWelcome = false
+    @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
+#if DEBUG
+    @State private var showsPoorPreview = true
+#endif
+
+    private var displayedSleep: SleepSummary {
+#if DEBUG
+        showsPoorPreview ? .poorPreview : sleep
+#else
+        sleep
+#endif
+    }
 
     var body: some View {
-        ZStack {
-            Color(red: 0.965, green: 0.945, blue: 0.91)
-                .ignoresSafeArea()
+        NavigationStack {
+            ZStack {
+                Color(red: 0.965, green: 0.945, blue: 0.91)
+                    .ignoresSafeArea()
 
-            VStack(spacing: 18) {
-                Spacer()
+                VStack(spacing: 18) {
+                    Spacer()
 
-                ZStack(alignment: .bottomLeading) {
-                    Image(sleep.bedAssetName)
-                        .resizable()
-                        .scaledToFit()
+                    ZStack(alignment: .bottomLeading) {
+                        Image(displayedSleep.bedAssetName)
+                            .resizable()
+                            .scaledToFit()
 
-                    Image(sleep.bedState.characterAssetName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 220)
-                        .offset(x: -2, y: 28)
-                }
-                .contentTransition(.opacity)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(sleep.bedState.accessibilityLabel)
+                        Image(displayedSleep.bedState.characterAssetName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 220)
+                            .offset(x: -2, y: 28)
+                    }
+                    .contentTransition(.opacity)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(displayedSleep.bedState.accessibilityLabel)
 
-                Text("\(sleep.score)")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundStyle(.indigo)
-                    .contentTransition(.numericText())
-                    .accessibilityLabel("Sleep Score \(sleep.score)")
+                    Text("\(displayedSleep.score)")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(.indigo)
+                        .contentTransition(.numericText())
+                        .accessibilityLabel("Sleep Score \(displayedSleep.score)")
+                        .offset(y: -8)
+
+                    HStack(spacing: 10) {
+                        SleepMetricCard(
+                            title: "Dauer",
+                            value: "\(displayedSleep.durationPoints)/50",
+                            detail: displayedSleep.sleepDurationText,
+                            color: .indigo
+                        )
+                        SleepMetricCard(
+                            title: "Effizienz",
+                            value: "\(displayedSleep.efficiencyPoints)/30",
+                            detail: "\(displayedSleep.awakeDurationText) wach",
+                            color: .cyan
+                        )
+                        SleepMetricCard(
+                            title: "Erholung",
+                            value: "\(displayedSleep.restorationPoints)/20",
+                            detail: displayedSleep.restorativeShareText,
+                            color: .orange
+                        )
+                    }
                     .offset(y: -8)
 
-                HStack(spacing: 10) {
-                    SleepMetricCard(
-                        title: "Dauer",
-                        value: "\(sleep.durationPoints)/50",
-                        detail: sleep.sleepDurationText,
-                        color: .indigo
-                    )
-                    SleepMetricCard(
-                        title: "Effizienz",
-                        value: "\(sleep.efficiencyPoints)/30",
-                        detail: "\(sleep.awakeDurationText) wach",
-                        color: .cyan
-                    )
-                    SleepMetricCard(
-                        title: "Erholung",
-                        value: "\(sleep.restorationPoints)/20",
-                        detail: sleep.restorativeShareText,
-                        color: .orange
-                    )
-                }
-                .offset(y: -8)
+                    if let healthMessage {
+                        Text(healthMessage)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
 
-                if let healthMessage {
-                    Text(healthMessage)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
+                    Spacer()
                 }
-
-                Spacer()
+                .padding(24)
             }
-            .padding(24)
+            .toolbar {
+#if DEBUG
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        withAnimation(.easeInOut) {
+                            showsPoorPreview.toggle()
+                        }
+                    } label: {
+                        Image(systemName: showsPoorPreview ? "moon.zzz.fill" : "heart.text.square")
+                    }
+                    .accessibilityLabel(
+                        showsPoorPreview
+                            ? "Echte Health-Daten anzeigen"
+                            : "Schlechten Testzustand anzeigen"
+                    )
+                }
+#endif
+
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showsWelcome = true
+                    } label: {
+                        Image(systemName: "questionmark.circle.fill")
+                            .symbolRenderingMode(.hierarchical)
+                    }
+                    .accessibilityLabel("Willkommen und Hilfe")
+                }
+            }
         }
         .task {
             do {
@@ -74,6 +117,119 @@ struct ContentView: View {
             } catch {
                 healthMessage = "Health-Zugriff erlauben, um die letzte Nacht anzuzeigen."
             }
+        }
+        .onAppear {
+            if !hasSeenWelcome {
+                showsWelcome = true
+            }
+        }
+        .sheet(isPresented: $showsWelcome) {
+            WelcomeView {
+                hasSeenWelcome = true
+                showsWelcome = false
+            }
+        }
+    }
+}
+
+private struct WelcomeView: View {
+    let dismiss: () -> Void
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.96, green: 0.97, blue: 1),
+                    Color(red: 0.88, green: 0.93, blue: 1)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    Image("GuyRefreshed")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 190)
+                        .accessibilityHidden(true)
+
+                    VStack(spacing: 8) {
+                        Text("Willkommen bei Yawn Sleep")
+                            .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                            .multilineTextAlignment(.center)
+
+                        Text("Deine Nacht – auf einen Blick.")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    VStack(spacing: 12) {
+                        WelcomeCard(
+                            icon: "heart.text.square.fill",
+                            title: "Aus Apple Health",
+                            text: "Yawn Sleep liest deine Schlafphasen und berechnet daraus deinen persönlichen Yawn Score."
+                        )
+                        WelcomeCard(
+                            icon: "bed.double.fill",
+                            title: "Ein Bett mit Gefühl",
+                            text: "Bett und Lil’ Finder Guy zeigen sofort, wie erholsam deine Nacht war."
+                        )
+                        WelcomeCard(
+                            icon: "lock.shield.fill",
+                            title: "Bleibt auf deinem Gerät",
+                            text: "Deine Gesundheitsdaten werden weder hochgeladen noch an Dritte weitergegeben."
+                        )
+                    }
+
+                    Button(action: dismiss) {
+                        Text("Los geht’s")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 15)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.indigo)
+
+                    Text("Über das ? kannst du diesen Bildschirm jederzeit wieder öffnen.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(24)
+            }
+        }
+    }
+}
+
+private struct WelcomeCard: View {
+    let icon: String
+    let title: String
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(.indigo)
+                .frame(width: 34)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                Text(text)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .overlay {
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(.white.opacity(0.7), lineWidth: 0.8)
         }
     }
 }
