@@ -35,6 +35,11 @@ struct SleepSummary: Sendable {
     let score: Int
     let bedState: BedState
 
+    init(score: Int) {
+        self.score = score
+        bedState = score >= 85 ? .refreshed : score >= 70 ? .okay : score >= 50 ? .restless : .exhausted
+    }
+
     var bedAssetName: String {
         switch score {
         case 80...: "BedTidy"
@@ -43,7 +48,7 @@ struct SleepSummary: Sendable {
         }
     }
 
-    static let placeholder = SleepSummary(score: 82, bedState: .okay)
+    static let placeholder = SleepSummary(score: 82)
 }
 
 enum SleepScore {
@@ -54,33 +59,30 @@ enum SleepScore {
         interruptionCount: Int
     ) -> SleepSummary {
         guard totalSleep > 0 else {
-            return SleepSummary(score: 0, bedState: .exhausted)
+            return SleepSummary(score: 0)
         }
 
         let hours = totalSleep / 3600
-        let durationQuality: Double
-        if hours < 7 + 5.0 / 6 {
-            durationQuality = max(0, hours / (7 + 5.0 / 6))
-        } else if hours > 9 {
-            durationQuality = max(0, (12 - hours) / 3)
-        } else {
-            durationQuality = 1
-        }
+        let durationQuality = min(1, max(0, (hours - (3 + 1.0 / 3)) / 4))
         let duration = durationQuality * 50
 
         let deviationMinutes = max(0, bedtimeConsistency / 60)
-        let timing = max(0, 1 - deviationMinutes / 57) * 30
+        let timing = max(0, 1 - max(0, deviationMinutes - 15) / 110) * 30
 
         let awakeMinutes = max(0, awake / 60)
         let durationPenalty = awakeMinutes / 11
-        let countPenalty = Double(max(0, interruptionCount - 1)) * 0.5
+        let countPenalty = Double(max(0, interruptionCount - 1)) * 0.8
         let interruptions = max(0, 20 - durationPenalty - countPenalty)
 
         let score = min(
             100,
-            max(0, Int((duration + timing + interruptions).rounded()))
+            max(
+                0,
+                Int(duration.rounded())
+                    + Int(timing.rounded())
+                    + Int(interruptions.rounded())
+            )
         )
-        let state: BedState = score >= 85 ? .refreshed : score >= 70 ? .okay : score >= 50 ? .restless : .exhausted
-        return SleepSummary(score: score, bedState: state)
+        return SleepSummary(score: score)
     }
 }

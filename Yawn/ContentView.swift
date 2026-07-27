@@ -107,7 +107,9 @@ struct ContentView: View {
         }
         .task {
             do {
-                sleep = try await SleepHealthStore.shared.latestNight()
+                let summary = try await SleepHealthStore.shared.latestNight()
+                sleep = summary
+                WatchScoreSync.shared.send(score: summary.score)
                 healthMessage = nil
             } catch {
                 healthMessage = "Health-Zugriff erlauben, um die letzte Nacht anzuzeigen."
@@ -223,7 +225,17 @@ private struct WelcomeView: View {
                         WelcomeCard(
                             icon: "heart.text.square.fill",
                             title: "Aus Apple Health",
-                            text: "Yawn Sleep liest deine Schlafphasen und berechnet daraus deinen persönlichen Yawn Score."
+                            text: "Yawn Sleep liest deine Schlaf- und Wachphasen und berechnet daraus deinen persönlichen Yawn Score."
+                        )
+                        WelcomeCard(
+                            icon: "function",
+                            title: "So entsteht dein Score",
+                            text: "Schlafdauer zählt bis zu 50 Punkte, die Regelmäßigkeit deiner Bettzeit bis zu 30 und ruhiger Schlaf mit wenigen Unterbrechungen bis zu 20 Punkte."
+                        )
+                        WelcomeCard(
+                            icon: "info.circle.fill",
+                            title: "Eine eigene Einschätzung",
+                            text: "Der Yawn Score ist eine transparente Näherung aus deinen Health-Daten. Er ist nicht der Apple Sleep Score und kann davon abweichen."
                         )
                         WelcomeCard(
                             icon: "bed.double.fill",

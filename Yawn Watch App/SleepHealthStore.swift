@@ -47,7 +47,7 @@ actor SleepHealthStore {
             .merged()
         let totalSleep = latestNight.totalSleep
         let awake = interruptions.reduce(0) { $0 + $1.duration }
-        let interruptionCount = interruptions.count { $0.duration >= 2 * 60 }
+        let interruptionCount = interruptions.count
         let bedtimeConsistency = nights.suffix(13).bedtimeConsistency()
 
         return SleepScore.summary(
@@ -110,18 +110,17 @@ private extension Collection where Element == SleepSession {
         }
         guard bedtimeMinutes.count > 1 else { return 0 }
 
-        let angles = bedtimeMinutes.map { $0 / (24 * 60) * 2 * Double.pi }
+        let latestBedtime = bedtimeMinutes[bedtimeMinutes.count - 1]
+        let historicalBedtimes = bedtimeMinutes.dropLast()
+        let angles = historicalBedtimes.map { $0 / (24 * 60) * 2 * Double.pi }
         let meanAngle = atan2(
             angles.reduce(0) { $0 + sin($1) },
             angles.reduce(0) { $0 + cos($1) }
         )
         let meanMinutes = (meanAngle >= 0 ? meanAngle : meanAngle + 2 * .pi)
             / (2 * .pi) * 24 * 60
-        let averageDeviation = bedtimeMinutes.reduce(0) { result, minutes in
-            let direct = abs(minutes - meanMinutes)
-            return result + Swift.min(direct, 24 * 60 - direct)
-        } / Double(bedtimeMinutes.count)
-        return averageDeviation * 60
+        let directDeviation = abs(latestBedtime - meanMinutes)
+        return Swift.min(directDeviation, 24 * 60 - directDeviation) * 60
     }
 }
 

@@ -141,27 +141,20 @@ enum SleepScore {
 
     static func durationPoints(totalSleep: TimeInterval) -> Int {
         let hours = totalSleep / 3600
-        let quality: Double
-        if hours < 7 + 5.0 / 6 {
-            quality = max(0, hours / (7 + 5.0 / 6))
-        } else if hours > 9 {
-            quality = max(0, (12 - hours) / 3)
-        } else {
-            quality = 1
-        }
+        let quality = min(1, max(0, (hours - (3 + 1.0 / 3)) / 4))
         return Int((quality * 50).rounded())
     }
 
     static func bedtimePoints(consistency: TimeInterval) -> Int {
         let deviationMinutes = max(0, consistency / 60)
-        let quality = max(0, 1 - deviationMinutes / 57)
+        let quality = max(0, 1 - max(0, deviationMinutes - 15) / 110)
         return Int((quality * 30).rounded())
     }
 
     static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
         let awakeMinutes = max(0, awake / 60)
         let durationPenalty = awakeMinutes / 11
-        let countPenalty = Double(max(0, count - 1)) * 0.5
+        let countPenalty = Double(max(0, count - 1)) * 0.8
         return Int(max(0, 20 - durationPenalty - countPenalty).rounded())
     }
 }

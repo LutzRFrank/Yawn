@@ -4,6 +4,7 @@ struct WatchContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var sleep = SleepSummary.placeholder
     @State private var sceneChoice = WatchMorningSceneChoice.random()
+    @StateObject private var phoneScoreStore = PhoneScoreStore.shared
 
     var body: some View {
         VStack(spacing: 2) {
@@ -22,9 +23,14 @@ struct WatchContentView: View {
             for: .navigation
         )
         .task {
-            if let summary = try? await SleepHealthStore.shared.latestNight() {
+            if let score = phoneScoreStore.score {
+                sleep = SleepSummary(score: score)
+            } else if let summary = try? await SleepHealthStore.shared.latestNight() {
                 sleep = summary
             }
+        }
+        .onReceive(phoneScoreStore.$score.compactMap { $0 }) { score in
+            sleep = SleepSummary(score: score)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
