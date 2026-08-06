@@ -62,25 +62,36 @@ enum SleepScore {
             return SleepSummary(score: 0)
         }
 
-        let hours = totalSleep / 3600
-        let durationQuality = min(1, max(0, (hours - (3 + 1.0 / 3)) / 4))
-        let duration = durationQuality * 50
+        let minutes = max(0, totalSleep / 60)
+        let duration: Double
+        switch minutes {
+        case 480...:
+            duration = 50
+        case 450..<480:
+            duration = 48 + (minutes - 450) / 15
+        case 420..<450:
+            duration = 45 + (minutes - 420) / 10
+        case 360..<420:
+            duration = 35 + (minutes - 360) / 6
+        default:
+            duration = max(0, (minutes - 200) * 35 / 160)
+        }
 
-        let deviationMinutes = max(0, bedtimeConsistency / 60)
-        let timing = max(0, 1 - max(0, deviationMinutes - 15) / 110) * 30
+        let minutesLater = max(0, bedtimeConsistency / 60)
+        let timing = max(0, 30 - max(0, minutesLater - 15) / 6)
 
         let awakeMinutes = max(0, awake / 60)
-        let durationPenalty = awakeMinutes / 11
-        let countPenalty = Double(max(0, interruptionCount - 1)) * 0.8
-        let interruptions = max(0, 20 - durationPenalty - countPenalty)
+        let durationPenalty = awakeMinutes / 20
+        let countPenalty = Double(max(0, interruptionCount - 4)) * 2
+        let interruptions = max(0, 20 - max(durationPenalty, countPenalty))
 
         let score = min(
             100,
             max(
                 0,
-                Int(duration.rounded())
+                Int(min(50, duration).rounded(.down))
                     + Int(timing.rounded())
-                    + Int(interruptions.rounded())
+                    + Int(interruptions.rounded(.down))
             )
         )
         return SleepSummary(score: score)

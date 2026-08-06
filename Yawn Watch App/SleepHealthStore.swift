@@ -119,8 +119,13 @@ private extension Collection where Element == SleepSession {
         )
         let meanMinutes = (meanAngle >= 0 ? meanAngle : meanAngle + 2 * .pi)
             / (2 * .pi) * 24 * 60
-        let directDeviation = abs(latestBedtime - meanMinutes)
-        return Swift.min(directDeviation, 24 * 60 - directDeviation) * 60
+        var deviation = latestBedtime - meanMinutes
+        if deviation > 12 * 60 {
+            deviation -= 24 * 60
+        } else if deviation < -12 * 60 {
+            deviation += 24 * 60
+        }
+        return deviation * 60
     }
 }
 

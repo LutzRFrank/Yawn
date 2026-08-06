@@ -111,7 +111,7 @@ struct SleepSummary: Sendable {
         ) ?? .now
     }
 
-    private static func durationText(_ duration: TimeInterval) -> String {
+    static func durationText(_ duration: TimeInterval) -> String {
         let minutes = max(0, Int((duration / 60).rounded()))
         let hours = minutes / 60
         let remainingMinutes = minutes % 60
@@ -140,21 +140,35 @@ enum SleepScore {
     }
 
     static func durationPoints(totalSleep: TimeInterval) -> Int {
-        let hours = totalSleep / 3600
-        let quality = min(1, max(0, (hours - (3 + 1.0 / 3)) / 4))
-        return Int((quality * 50).rounded())
+        let minutes = max(0, totalSleep / 60)
+        let points: Double
+
+        switch minutes {
+        case 480...:
+            points = 50
+        case 450..<480:
+            points = 48 + (minutes - 450) / 15
+        case 420..<450:
+            points = 45 + (minutes - 420) / 10
+        case 360..<420:
+            points = 35 + (minutes - 360) / 6
+        default:
+            points = max(0, (minutes - 200) * 35 / 160)
+        }
+
+        return Int(min(50, points).rounded(.down))
     }
 
     static func bedtimePoints(consistency: TimeInterval) -> Int {
-        let deviationMinutes = max(0, consistency / 60)
-        let quality = max(0, 1 - max(0, deviationMinutes - 15) / 110)
-        return Int((quality * 30).rounded())
+        let minutesLater = max(0, consistency / 60)
+        let penalty = max(0, minutesLater - 15) / 6
+        return Int(max(0, 30 - penalty).rounded())
     }
 
     static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
         let awakeMinutes = max(0, awake / 60)
-        let durationPenalty = awakeMinutes / 11
-        let countPenalty = Double(max(0, count - 1)) * 0.8
-        return Int(max(0, 20 - durationPenalty - countPenalty).rounded())
+        let durationPenalty = awakeMinutes / 20
+        let countPenalty = Double(max(0, count - 4)) * 2
+        return Int(max(0, 20 - max(durationPenalty, countPenalty)).rounded(.down))
     }
 }
