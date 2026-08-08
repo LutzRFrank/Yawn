@@ -60,7 +60,7 @@ actor SleepHealthStore {
             .merged()
         let totalSleep = latestNight.totalSleep
         let awake = interruptions.reduce(0) { $0 + $1.duration }
-        let interruptionCount = interruptions.count
+        let interruptionCount = interruptions.eventCount(maximumGap: 2 * 60)
         let bedtimeConsistency = nights.suffix(13).bedtimeConsistency()
 
         return SleepSummary(
@@ -119,6 +119,20 @@ private extension Array where Element == DateInterval {
                 intervals: lastSession.intervals + [interval]
             )
         }
+    }
+
+    func eventCount(maximumGap: TimeInterval) -> Int {
+        guard let first else { return 0 }
+
+        var count = 1
+        var eventEnd = first.end
+        for interval in dropFirst() {
+            if interval.start.timeIntervalSince(eventEnd) > maximumGap {
+                count += 1
+            }
+            eventEnd = Swift.max(eventEnd, interval.end)
+        }
+        return count
     }
 }
 
