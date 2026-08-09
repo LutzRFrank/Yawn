@@ -161,7 +161,9 @@ enum SleepScore {
 
     static func bedtimePoints(consistency: TimeInterval) -> Int {
         let minutesLater = max(0, consistency / 60)
-        let penalty = max(0, minutesLater - 15) / 6
+        let basePenalty = max(0, minutesLater - 15) / 6
+        let latePenalty = max(0, minutesLater - 60) / 7
+        let penalty = basePenalty + latePenalty
         return Int(max(0, 30 - penalty).rounded())
     }
 

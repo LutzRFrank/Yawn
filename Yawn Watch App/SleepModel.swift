@@ -78,7 +78,9 @@ enum SleepScore {
         }
 
         let minutesLater = max(0, bedtimeConsistency / 60)
-        let timing = max(0, 30 - max(0, minutesLater - 15) / 6)
+        let baseTimingPenalty = max(0, minutesLater - 15) / 6
+        let lateTimingPenalty = max(0, minutesLater - 60) / 7
+        let timing = max(0, 30 - baseTimingPenalty - lateTimingPenalty)
 
         let awakeMinutes = max(0, awake / 60)
         let durationPenalty = awakeMinutes / 20
