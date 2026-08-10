@@ -142,21 +142,27 @@ enum SleepScore {
     static func durationPoints(totalSleep: TimeInterval) -> Int {
         let minutes = max(0, totalSleep / 60)
         let points: Double
+        let roundingRule: FloatingPointRoundingRule
 
         switch minutes {
         case 480...:
             points = 50
+            roundingRule = .down
         case 450..<480:
             points = 48 + (minutes - 450) / 15
+            roundingRule = .down
         case 420..<450:
             points = 45 + (minutes - 420) / 10
+            roundingRule = .toNearestOrAwayFromZero
         case 360..<420:
             points = 35 + (minutes - 360) / 6
+            roundingRule = .down
         default:
             points = max(0, (minutes - 200) * 35 / 160)
+            roundingRule = .down
         }
 
-        return Int(min(50, points).rounded(.down))
+        return Int(min(50, points).rounded(roundingRule))
     }
 
     static func bedtimePoints(consistency: TimeInterval) -> Int {
@@ -170,7 +176,8 @@ enum SleepScore {
     static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
         let awakeMinutes = max(0, awake / 60)
         let durationPenalty = awakeMinutes / 20
-        let countPenalty = Double(max(0, count - 4)) * 2
+        let rawCountPenalty = Double(max(0, count - 4)) * 2
+        let countPenalty = max(0, rawCountPenalty - (count >= 8 ? 1 : 0))
         return Int(max(0, 20 - max(durationPenalty, countPenalty)).rounded(.down))
     }
 }

@@ -64,17 +64,23 @@ enum SleepScore {
 
         let minutes = max(0, totalSleep / 60)
         let duration: Double
+        let durationRoundingRule: FloatingPointRoundingRule
         switch minutes {
         case 480...:
             duration = 50
+            durationRoundingRule = .down
         case 450..<480:
             duration = 48 + (minutes - 450) / 15
+            durationRoundingRule = .down
         case 420..<450:
             duration = 45 + (minutes - 420) / 10
+            durationRoundingRule = .toNearestOrAwayFromZero
         case 360..<420:
             duration = 35 + (minutes - 360) / 6
+            durationRoundingRule = .down
         default:
             duration = max(0, (minutes - 200) * 35 / 160)
+            durationRoundingRule = .down
         }
 
         let minutesLater = max(0, bedtimeConsistency / 60)
@@ -84,14 +90,18 @@ enum SleepScore {
 
         let awakeMinutes = max(0, awake / 60)
         let durationPenalty = awakeMinutes / 20
-        let countPenalty = Double(max(0, interruptionCount - 4)) * 2
+        let rawCountPenalty = Double(max(0, interruptionCount - 4)) * 2
+        let countPenalty = max(
+            0,
+            rawCountPenalty - (interruptionCount >= 8 ? 1 : 0)
+        )
         let interruptions = max(0, 20 - max(durationPenalty, countPenalty))
 
         let score = min(
             100,
             max(
                 0,
-                Int(min(50, duration).rounded(.down))
+                Int(min(50, duration).rounded(durationRoundingRule))
                     + Int(timing.rounded())
                     + Int(interruptions.rounded(.down))
             )
