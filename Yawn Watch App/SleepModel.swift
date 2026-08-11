@@ -73,8 +73,8 @@ enum SleepScore {
             duration = 48 + (minutes - 450) / 15
             durationRoundingRule = .down
         case 420..<450:
-            duration = 45 + (minutes - 420) / 10
-            durationRoundingRule = .toNearestOrAwayFromZero
+            duration = 46 + (minutes - 420) / 15
+            durationRoundingRule = .down
         case 360..<420:
             duration = 35 + (minutes - 360) / 6
             durationRoundingRule = .down
@@ -96,6 +96,9 @@ enum SleepScore {
             rawCountPenalty - (interruptionCount >= 8 ? 1 : 0)
         )
         let interruptions = max(0, 20 - max(durationPenalty, countPenalty))
+        let interruptionRoundingRule: FloatingPointRoundingRule = interruptionCount <= 1
+            ? .toNearestOrAwayFromZero
+            : .down
 
         let score = min(
             100,
@@ -103,7 +106,7 @@ enum SleepScore {
                 0,
                 Int(min(50, duration).rounded(durationRoundingRule))
                     + Int(timing.rounded())
-                    + Int(interruptions.rounded(.down))
+                    + Int(interruptions.rounded(interruptionRoundingRule))
             )
         )
         return SleepSummary(score: score)

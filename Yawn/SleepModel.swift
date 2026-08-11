@@ -152,8 +152,8 @@ enum SleepScore {
             points = 48 + (minutes - 450) / 15
             roundingRule = .down
         case 420..<450:
-            points = 45 + (minutes - 420) / 10
-            roundingRule = .toNearestOrAwayFromZero
+            points = 46 + (minutes - 420) / 15
+            roundingRule = .down
         case 360..<420:
             points = 35 + (minutes - 360) / 6
             roundingRule = .down
@@ -178,6 +178,11 @@ enum SleepScore {
         let durationPenalty = awakeMinutes / 20
         let rawCountPenalty = Double(max(0, count - 4)) * 2
         let countPenalty = max(0, rawCountPenalty - (count >= 8 ? 1 : 0))
-        return Int(max(0, 20 - max(durationPenalty, countPenalty)).rounded(.down))
+        let roundingRule: FloatingPointRoundingRule = count <= 1
+            ? .toNearestOrAwayFromZero
+            : .down
+        return Int(
+            max(0, 20 - max(durationPenalty, countPenalty)).rounded(roundingRule)
+        )
     }
 }
