@@ -44,13 +44,16 @@ function setLanguage(language) {
   const copy = translations[lang];
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-i18n]").forEach((element) => {
-    element.textContent = copy[element.dataset.i18n];
+    const value = copy[element.dataset.i18n];
+    if (value !== undefined) element.textContent = value;
   });
   document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
-    element.setAttribute("aria-label", copy[element.dataset.i18nAria]);
+    const value = copy[element.dataset.i18nAria];
+    if (value !== undefined) element.setAttribute("aria-label", value);
   });
   document.querySelectorAll("[data-i18n-alt]").forEach((element) => {
-    element.setAttribute("alt", copy[element.dataset.i18nAlt]);
+    const value = copy[element.dataset.i18nAlt];
+    if (value !== undefined) element.setAttribute("alt", value);
   });
   document.querySelectorAll("[data-language]").forEach((element) => {
     element.hidden = element.dataset.language !== lang;
