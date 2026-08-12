@@ -58,10 +58,15 @@ actor SleepHealthStore {
         let interruptions = awakeIntervals
             .compactMap { $0.intersection(with: sleepWindow) }
             .merged()
+            // Apple does not treat sub-minute awake samples as reportable
+            // interruptions. Ignoring them also prevents one brief transition
+            // between sleep stages from inflating both count and awake time.
+            .filter { $0.duration >= 60 }
         let totalSleep = latestNight.totalSleep
         let awake = interruptions.reduce(0) { $0 + $1.duration }
         let interruptionCount = interruptions.eventCount(maximumGap: 2 * 60)
-        let bedtimeConsistency = nights.suffix(13).bedtimeConsistency()
+        // Compare the latest night with up to 13 preceding nights.
+        let bedtimeConsistency = nights.suffix(14).bedtimeConsistency()
 
         return SleepSummary(
             score: SleepScore.calculate(
