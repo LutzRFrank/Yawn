@@ -7,15 +7,17 @@
   <title>Yawn Sleep Support</title>
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="styles.css">
+  <script src="localization.js" defer></script>
 </head>
-<body>
+<body data-page="support">
   <div class="shell">
-    <nav aria-label="Main navigation">
+    <nav aria-label="Main navigation" data-i18n-aria="navLabel">
       <a class="brand" href="index.html"><img src="assets/icon.png" alt=""><span>Yawn Sleep</span></a>
-      <div class="nav-links"><a href="support.html">Support</a><a href="privacy.html">Privacy</a><a href="https://github.com/LutzRFrank/Yawn">GitHub</a></div>
+      <div class="nav-links"><a href="support.html" data-i18n="support">Support</a><a href="privacy.html" data-i18n="privacy">Privacy</a><a href="https://apps.apple.com/app/yawn-sleep/id6794833808" data-i18n="appStore">App Store</a><div class="language-switcher" aria-label="Language"><button type="button" data-language-button="de">DE</button><button type="button" data-language-button="en">EN</button></div></div>
     </nav>
 
     <main class="document glass">
+      <div data-language="en">
       <p class="eyebrow">Help</p>
       <h1>Yawn Sleep Support</h1>
       <p>Yawn Sleep visualizes your recent sleep on iPhone and Apple Watch using sleep-stage data you choose to share from Apple Health.</p>
@@ -36,9 +38,12 @@
       <h2>Contact and feedback</h2>
       <p>For help, reproducible bugs, or feature requests, <a href="https://github.com/LutzRFrank/Yawn/issues/new">open a GitHub issue</a>. Please do not include screenshots or text containing sensitive health information.</p>
 
-      <div class="language-divider"></div>
+      </div>
 
-      <p class="eyebrow" lang="de">Hilfe auf Deutsch</p>
+      <div data-language="de" lang="de" hidden>
+      <p class="eyebrow">Hilfe</p>
+      <h1>Yawn Sleep Support</h1>
+      <p>Yawn Sleep visualisiert deinen letzten Schlaf auf iPhone und Apple Watch mithilfe der Schlafphasen, die du aus Apple Health freigibst.</p>
       <h2 lang="de">Erste Schritte</h2>
       <ol lang="de">
         <li>Öffne Yawn auf dem iPhone.</li>
@@ -54,6 +59,7 @@
 
       <h2 lang="de">Kontakt und Feedback</h2>
       <p lang="de">Bei Fragen, nachvollziehbaren Fehlern oder Ideen kannst du ein <a href="https://github.com/LutzRFrank/Yawn/issues/new">GitHub Issue erstellen</a>. Bitte veröffentliche dabei keine sensiblen Gesundheitsdaten.</p>
+      </div>
     </main>
     <footer>© 2026 Lutz R. Frank</footer>
   </div>

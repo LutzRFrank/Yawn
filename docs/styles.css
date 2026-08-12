@@ -62,6 +62,7 @@ nav {
 
 .nav-links {
   display: flex;
+  align-items: center;
   gap: 18px;
   font-size: 0.94rem;
 }
@@ -74,6 +75,35 @@ nav {
 .nav-links a:hover,
 .nav-links a:focus-visible {
   color: var(--text);
+}
+
+.language-switcher {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: var(--glass);
+}
+
+.language-switcher button {
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.language-switcher button.active {
+  color: white;
+  background: var(--blue);
+}
+
+[hidden] {
+  display: none !important;
 }
 
 .glass {
@@ -444,6 +474,20 @@ footer {
 
   .card p {
     min-height: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 9px;
   }
 }
 

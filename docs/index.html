@@ -8,18 +8,20 @@
   <title>Yawn Sleep — Sleep at a glance</title>
   <link rel="icon" href="assets/icon.png">
   <link rel="stylesheet" href="styles.css">
+  <script src="localization.js" defer></script>
 </head>
-<body>
+<body data-page="home">
   <div class="shell">
-    <nav aria-label="Main navigation">
+    <nav aria-label="Main navigation" data-i18n-aria="navLabel">
       <a class="brand" href="index.html">
         <img src="assets/icon.png" alt="">
         <span>Yawn Sleep</span>
       </a>
       <div class="nav-links">
-        <a href="support.html">Support</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="https://github.com/LutzRFrank/Yawn">GitHub</a>
+        <a href="support.html" data-i18n="support">Support</a>
+        <a href="privacy.html" data-i18n="privacy">Privacy</a>
+        <a href="https://apps.apple.com/app/yawn-sleep/id6794833808" data-i18n="appStore">App Store</a>
+        <div class="language-switcher" aria-label="Language"><button type="button" data-language-button="de">DE</button><button type="button" data-language-button="en">EN</button></div>
       </div>
     </nav>
 
@@ -27,20 +29,21 @@
       <section class="hero glass">
         <div>
           <p class="eyebrow">iPhone + Apple Watch</p>
-          <h1>Sleep at a glance.</h1>
-          <p class="lead">
+          <h1 data-i18n="heroTitle">Sleep at a glance.</h1>
+          <p class="lead" data-i18n="heroLead">
             Yawn Sleep turns last night’s sleep into one friendly glance. A soft 3D
             bed and the Little Sleep Companion react to a locally calculated Yawn Score.
           </p>
           <div class="actions">
-            <a class="button" href="support.html">Get support</a>
-            <a class="button secondary" href="privacy.html">Privacy policy</a>
+            <a class="button" href="https://apps.apple.com/app/yawn-sleep/id6794833808" data-i18n="download">Download on the App Store</a>
+            <a class="button secondary" href="support.html" data-i18n="getSupport">Get support</a>
           </div>
         </div>
         <div
           class="hero-art pillow-fight"
           role="img"
           aria-label="Lil’ Guy enjoys a cheerful pillow fight, alternating between another Lil’ Guy and a pink Lil’ Girl with pigtails"
+          data-i18n-aria="heroArt"
         >
           <img
             class="pillow-fight-scene"
@@ -57,63 +60,66 @@
 
       <section class="app-preview" aria-labelledby="app-preview-title">
         <div class="section-heading">
-          <p class="eyebrow">Meet your morning</p>
-          <h2 id="app-preview-title">A score with a little soul.</h2>
-          <p>One number, three simple signals, and a tiny companion who already knows how the night went.</p>
+          <p class="eyebrow" data-i18n="meetMorning">Meet your morning</p>
+          <h2 id="app-preview-title" data-i18n="scoreSoul">A score with a little soul.</h2>
+          <p data-i18n="scoreIntro">One number, three simple signals, and a tiny companion who already knows how the night went.</p>
         </div>
         <div class="screens">
           <figure class="screen screen-low">
             <img
               src="assets/screens/yawn-score-38.jpg"
               alt="Yawn Sleep showing a score of 38 with a tired Lil’ Guy beside an unmade bed"
+              data-i18n-alt="lowAlt"
               loading="lazy"
               width="720"
               height="1564"
             >
-            <figcaption>Rough night?</figcaption>
+            <figcaption data-i18n="roughNight">Rough night?</figcaption>
           </figure>
           <figure class="screen screen-high">
             <img
               src="assets/screens/yawn-score-88.jpg"
               alt="Yawn Sleep showing a score of 88 with a cheerful Lil’ Guy jumping on the bed"
+              data-i18n-alt="highAlt"
               loading="lazy"
               width="720"
               height="1564"
             >
-            <figcaption>Ready for the day.</figcaption>
+            <figcaption data-i18n="readyDay">Ready for the day.</figcaption>
           </figure>
           <figure class="screen screen-character">
             <img
               src="assets/screens/yawn-score-lil-girl.jpg"
               alt="Yawn Sleep showing a score of 88 with Lil’ Girl enjoying a pillow fight"
+              data-i18n-alt="girlAlt"
               loading="lazy"
               width="720"
               height="1564"
             >
-            <figcaption>Make it yours.</figcaption>
+            <figcaption data-i18n="makeYours">Make it yours.</figcaption>
           </figure>
         </div>
       </section>
 
       <section class="cards" aria-label="Information">
         <article class="card glass">
-          <h2>Private by design</h2>
-          <p>Your Health data stays on your devices. Yawn Sleep has no account, analytics, ads, or tracking.</p>
-          <a href="privacy.html">Read the policy →</a>
+          <h2 data-i18n="privateTitle">Private by design</h2>
+          <p data-i18n="privateText">Your Health data stays on your devices. Yawn Sleep has no account, analytics, ads, or tracking.</p>
+          <a href="privacy.html" data-i18n="readPolicy">Read the policy →</a>
         </article>
         <article class="card glass">
-          <h2>Need help?</h2>
-          <p>Find setup guidance for Health permissions, iPhone, and Apple Watch.</p>
-          <a href="support.html">Open support →</a>
+          <h2 data-i18n="helpTitle">Need help?</h2>
+          <p data-i18n="helpText">Find setup guidance for Health permissions, iPhone, and Apple Watch.</p>
+          <a href="support.html" data-i18n="openSupport">Open support →</a>
         </article>
         <article class="card glass">
-          <h2>Found a problem?</h2>
-          <p>Share reproducible issues and feature ideas through the public issue tracker.</p>
-          <a href="https://github.com/LutzRFrank/Yawn/issues/new">Report an issue →</a>
+          <h2 data-i18n="appStoreTitle">Ready for a better morning?</h2>
+          <p data-i18n="appStoreText">Download Yawn Sleep for free on iPhone and Apple Watch.</p>
+          <a href="https://apps.apple.com/app/yawn-sleep/id6794833808" data-i18n="viewAppStore">View on the App Store →</a>
         </article>
       </section>
     </main>
-    <footer>© 2026 Lutz R. Frank · Yawn Sleep is an independent app and is not affiliated with Apple.</footer>
+    <footer data-i18n="homeFooter">© 2026 Lutz R. Frank · Yawn Sleep is an independent app and is not affiliated with Apple.</footer>
   </div>
 </body>
 </html>
