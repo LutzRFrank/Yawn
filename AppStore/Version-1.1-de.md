@@ -2,30 +2,31 @@
 
 ## Was ist neu?
 
-Lil’ Finder Guy ist jetzt jeden Morgen für eine Überraschung gut:
+Yawn Sleep spricht jetzt Deutsch und Englisch – auf iPhone und Apple Watch.
 
-• Mehrere liebevoll gestaltete Szenen für jede Yawn-Score-Kategorie  
-• Eine neue Szene bei jedem erneuten Öffnen der App  
-• Gelegentliche Gastauftritte von Lil’ Finder Lady  
-• Dieselbe charmante Abwechslung auf iPhone und Apple Watch
+Außerdem neu in Version 1.1:
 
-Die wechselnden Illustrationen sind rein visuell. Dein Yawn Score und seine
-Berechnung aus Schlafdauer, Effizienz und erholsamen Schlafphasen bleiben
-unverändert.
+• Verfeinerte Bewertung von Schlafdauer, Bettzeit und Unterbrechungen
+• Nahe beieinanderliegende Wachphasen werden sinnvoll zusammengefasst
+• Ein lokaler Diagnosebericht macht die Berechnung nachvollziehbar
+• Mehrere liebevoll gestaltete Szenen für jede Yawn-Score-Kategorie
+• Gelegentliche Gastauftritte von Lil’ Finder Lady
+
+Alle Schlafdaten bleiben lokal auf deinem Gerät. Yawn verwendet HealthKit nur
+lesend und enthält weder Tracking noch Werbung.
 
 ## Werbetext
 
-Deine Nacht, jeden Morgen neu erzählt: Lil’ Finder Guy, sein Bett und manchmal
-Lil’ Finder Lady verwandeln deinen Yawn Score in eine passende kleine Szene.
+Jetzt auf Deutsch und Englisch: Dein Yawn Score erklärt Schlafdauer, Bettzeit
+und Unterbrechungen – privat, lokal und mit einer kleinen Szene für den Morgen.
 
 ## Review-Hinweis zu Version 1.1
 
-Version 1.1 adds multiple visual scene variants for every Yawn Score category.
-When the iPhone or Apple Watch app becomes active, it randomly selects one
-illustration from the matching category. A rare Lil’ Finder Lady scene may also
-appear.
+Version 1.1 adds complete German and English localization on iPhone and Apple
+Watch, refines the local Yawn Score calculation, groups adjacent wake samples
+into meaningful interruptions, and adds a shareable diagnostic summary. It
+also includes multiple visual scene variants for every score category.
 
-This variation is entirely visual. It does not alter the calculated Yawn Score,
-the underlying HealthKit samples, the score category, or any HealthKit access.
-All processing remains local and read-only.
-
+The app reads only Sleep Analysis data from HealthKit. No HealthKit samples or
+personal identifiers are included in the diagnostic report. All processing
+remains local; the app has no account, analytics, advertising, or tracking.

@@ -23,10 +23,10 @@ enum BedState: Sendable {
 
     var accessibilityLabel: String {
         switch self {
-        case .exhausted: "Sehr zerwühltes Bett"
-        case .restless: "Unruhiges Bett"
-        case .okay: "Leicht zerknittertes Bett"
-        case .refreshed: "Ordentliches Bett"
+        case .exhausted: String(localized: "Sehr zerwühltes Bett")
+        case .restless: String(localized: "Unruhiges Bett")
+        case .okay: String(localized: "Leicht zerknittertes Bett")
+        case .refreshed: String(localized: "Ordentliches Bett")
         }
     }
 }

@@ -1,0 +1,3 @@
+"CFBundleDisplayName" = "Yawn Sleep";
+"NSHealthShareUsageDescription" = "Yawn liest deine Schlafphasen, um dein Bett und deinen Yawn Score anzuzeigen.";
+"NSHealthUpdateUsageDescription" = "Yawn Sleep schreibt keine Gesundheitsdaten. HealthKit wird ausschließlich zum Lesen deiner Schlafphasen für den Yawn Score verwendet.";

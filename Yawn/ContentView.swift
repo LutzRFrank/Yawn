@@ -48,19 +48,19 @@ struct ContentView: View {
 
                     HStack(spacing: 10) {
                         SleepMetricCard(
-                            title: "Dauer",
+                            title: String(localized: "Dauer"),
                             value: "\(displayedSleep.durationPoints)/50",
                             detail: displayedSleep.sleepDurationText,
                             color: .indigo
                         )
                         SleepMetricCard(
-                            title: "Bettzeit",
+                            title: String(localized: "Bettzeit"),
                             value: "\(displayedSleep.bedtimePoints)/30",
                             detail: displayedSleep.bedtimeText,
                             color: .cyan
                         )
                         SleepMetricCard(
-                            title: "Ruhe",
+                            title: String(localized: "Ruhe"),
                             value: "\(displayedSleep.interruptionPoints)/20",
                             detail: displayedSleep.interruptionText,
                             color: .orange
@@ -122,7 +122,9 @@ struct ContentView: View {
                 WatchScoreSync.shared.send(score: summary.score)
                 healthMessage = nil
             } catch {
-                healthMessage = "Health-Zugriff erlauben, um die letzte Nacht anzuzeigen."
+                healthMessage = String(
+                    localized: "Health-Zugriff erlauben, um die letzte Nacht anzuzeigen."
+                )
             }
         }
         .onAppear {
@@ -276,28 +278,28 @@ private struct WelcomeView: View {
                     VStack(spacing: 12) {
                         WelcomeCard(
                             icon: "heart.text.square.fill",
-                            title: "Aus Apple Health",
-                            text: "Yawn Sleep liest deine Schlaf- und Wachphasen und berechnet daraus deinen persönlichen Yawn Score."
+                            title: String(localized: "Aus Apple Health"),
+                            text: String(localized: "Yawn Sleep liest deine Schlaf- und Wachphasen und berechnet daraus deinen persönlichen Yawn Score.")
                         )
                         WelcomeCard(
                             icon: "function",
-                            title: "So entsteht dein Score",
-                            text: "Schlafdauer zählt bis zu 50 Punkte, die Regelmäßigkeit deiner Bettzeit bis zu 30 und ruhiger Schlaf mit wenigen Unterbrechungen bis zu 20 Punkte."
+                            title: String(localized: "So entsteht dein Score"),
+                            text: String(localized: "Schlafdauer zählt bis zu 50 Punkte, die Regelmäßigkeit deiner Bettzeit bis zu 30 und ruhiger Schlaf mit wenigen Unterbrechungen bis zu 20 Punkte.")
                         )
                         WelcomeCard(
                             icon: "info.circle.fill",
-                            title: "Eine eigene Einschätzung",
-                            text: "Der Yawn Score ist eine transparente Näherung aus deinen Health-Daten. Er ist nicht der Apple Sleep Score und kann davon abweichen."
+                            title: String(localized: "Eine eigene Einschätzung"),
+                            text: String(localized: "Der Yawn Score ist eine transparente Näherung aus deinen Health-Daten. Er ist nicht der Apple Sleep Score und kann davon abweichen.")
                         )
                         WelcomeCard(
                             icon: "bed.double.fill",
-                            title: "Ein Bett mit Gefühl",
-                            text: "Bett und Lil’ Finder Guy zeigen sofort, wie erholsam deine Nacht war."
+                            title: String(localized: "Ein Bett mit Gefühl"),
+                            text: String(localized: "Bett und Lil’ Finder Guy zeigen sofort, wie erholsam deine Nacht war.")
                         )
                         WelcomeCard(
                             icon: "lock.shield.fill",
-                            title: "Bleibt auf deinem Gerät",
-                            text: "Deine Gesundheitsdaten werden weder hochgeladen noch an Dritte weitergegeben."
+                            title: String(localized: "Bleibt auf deinem Gerät"),
+                            text: String(localized: "Deine Gesundheitsdaten werden weder hochgeladen noch an Dritte weitergegeben.")
                         )
                     }
 
@@ -416,20 +418,21 @@ private struct DiagnosticReportView: View {
     }
 
     private var reportText: String {
-        """
-        Yawn Sleep Diagnosebericht
-        App: \(versionText)
-        Erstellt: \(Date.now.formatted(date: .numeric, time: .shortened))
-
-        Yawn Score: \(sleep.score)
-        Dauer: \(sleep.durationPoints)/50 · \(sleep.sleepDurationText)
-        Bettzeit: \(sleep.bedtimePoints)/30 · \(sleep.bedtimeText)
-        Bettzeit-Abweichung: \(SleepSummary.durationText(abs(sleep.bedtimeConsistency)))
-        Ruhe: \(sleep.interruptionPoints)/20 · \(sleep.interruptionText)
-
-        Die Daten stammen lokal aus Apple Health. Es werden keine einzelnen
-        HealthKit-Samples oder persönlichen Kennungen in diesen Bericht aufgenommen.
-        """
+        let created = Date.now.formatted(date: .numeric, time: .shortened)
+        let deviation = SleepSummary.durationText(abs(sleep.bedtimeConsistency))
+        return String(
+            format: NSLocalizedString("diagnostic.report", comment: "Shared diagnostic report"),
+            versionText,
+            created,
+            sleep.score,
+            sleep.durationPoints,
+            sleep.sleepDurationText,
+            sleep.bedtimePoints,
+            sleep.bedtimeText,
+            deviation,
+            sleep.interruptionPoints,
+            sleep.interruptionText
+        )
     }
 
     var body: some View {

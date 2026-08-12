@@ -2,30 +2,31 @@
 
 ## What’s New
 
-Lil’ Finder Guy now brings a little surprise to every morning:
+Yawn Sleep now speaks English and German on iPhone and Apple Watch.
 
-• Multiple lovingly crafted scenes for every Yawn Score category  
-• A new scene whenever you reopen the app  
-• Occasional guest appearances by Lil’ Finder Lady  
-• The same delightful variety on iPhone and Apple Watch
+Also new in version 1.1:
 
-The changing illustrations are purely visual. Your Yawn Score and its
-calculation from sleep duration, efficiency, and restorative sleep stages
-remain unchanged.
+• Refined scoring for sleep duration, bedtime, and interruptions
+• Nearby wake periods are grouped into meaningful interruptions
+• A local diagnostic report makes the score easier to understand
+• Multiple lovingly crafted scenes for every Yawn Score category
+• Occasional guest appearances by Lil’ Finder Lady
+
+All sleep data stays on your device. Yawn uses read-only HealthKit access and
+includes no tracking or advertising.
 
 ## Promotional text
 
-Your night, told a little differently every morning: Lil’ Finder Guy, his bed,
-and sometimes Lil’ Finder Lady turn your Yawn Score into a fitting little scene.
+Now in English and German: understand your sleep duration, bedtime, and
+interruptions with a private, local Yawn Score and a little morning scene.
 
 ## App Review note for version 1.1
 
-Version 1.1 adds multiple visual scene variants for every Yawn Score category.
-When the iPhone or Apple Watch app becomes active, it randomly selects one
-illustration from the matching category. A rare Lil’ Finder Lady scene may also
-appear.
+Version 1.1 adds complete German and English localization on iPhone and Apple
+Watch, refines the local Yawn Score calculation, groups adjacent wake samples
+into meaningful interruptions, and adds a shareable diagnostic summary. It
+also includes multiple visual scene variants for every score category.
 
-This variation is entirely visual. It does not alter the calculated Yawn Score,
-the underlying HealthKit samples, the score category, or any HealthKit access.
-All processing remains local and read-only.
-
+The app reads only Sleep Analysis data from HealthKit. No HealthKit samples or
+personal identifiers are included in the diagnostic report. All processing
+remains local; the app has no account, analytics, advertising, or tracking.
