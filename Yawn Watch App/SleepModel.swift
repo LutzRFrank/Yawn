@@ -89,7 +89,8 @@ enum SleepScore {
         let timing = max(0, 30 - baseTimingPenalty - lateTimingPenalty)
 
         let awakeMinutes = max(0, awake / 60)
-        let durationPenalty = awakeMinutes / 20
+        let durationPenalty = awakeMinutes / 10
+            + max(0, awakeMinutes - 25) / 6
         let rawCountPenalty = Double(max(0, interruptionCount - 4)) * 2
         let countPenalty = max(
             0,

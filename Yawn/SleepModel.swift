@@ -175,7 +175,8 @@ enum SleepScore {
 
     static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
         let awakeMinutes = max(0, awake / 60)
-        let durationPenalty = awakeMinutes / 20
+        let durationPenalty = awakeMinutes / 10
+            + max(0, awakeMinutes - 25) / 6
         let rawCountPenalty = Double(max(0, count - 4)) * 2
         let countPenalty = max(0, rawCountPenalty - (count >= 8 ? 1 : 0))
         let roundingRule: FloatingPointRoundingRule = count <= 1
