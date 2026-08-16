@@ -1,6 +1,6 @@
 const translations = {
   en: {
-    navLabel: "Main navigation", support: "Support", privacy: "Privacy", appStore: "App Store",
+    navLabel: "Main navigation", companions: "Companions", support: "Support", privacy: "Privacy", appStore: "App Store",
     homeDescription: "Support and privacy information for Yawn Sleep on iPhone and Apple Watch.",
     homeTitle: "Yawn Sleep — Sleep at a glance", heroTitle: "Sleep at a glance.",
     heroLead: "Yawn Sleep turns last night’s sleep into one friendly glance. A soft 3D bed and the Little Sleep Companion react to a locally calculated Yawn Score.",
@@ -16,10 +16,18 @@ const translations = {
     appStoreTitle: "Ready for a better morning?", appStoreText: "Download Yawn Sleep for free on iPhone and Apple Watch.", viewAppStore: "View on the App Store →",
     homeFooter: "© 2026 Lutz R. Frank · Yawn Sleep is an independent app and is not affiliated with Apple.",
     supportDescription: "Support for the Yawn Sleep iPhone and Apple Watch app.", supportTitle: "Yawn Sleep Support",
-    privacyDescription: "Privacy policy for the Yawn Sleep iPhone and Apple Watch app.", privacyTitle: "Yawn Sleep Privacy Policy"
+    privacyDescription: "Privacy policy for the Yawn Sleep iPhone and Apple Watch app.", privacyTitle: "Yawn Sleep Privacy Policy",
+    companionsDescription: "A first look at the new Sleep Companions coming to Yawn Sleep 1.2.", companionsTitle: "Sleep Companions — Coming soon to Yawn Sleep",
+    comingSoon: "Coming soon in Yawn Sleep 1.2", companionsEyebrow: "The morning crew", companionsHero: "Every night has a character.",
+    companionsLead: "Meet a few of the Sleep Companions waiting to turn your last night into a small morning story.",
+    galleryLabel: "Preview gallery of Sleep Companions", galleryNote: "A hand-picked preview — some mornings are calm, some are chaotic, and a few are better together.",
+    asleepTogether: "Out together", pillowTrouble: "Pillow trouble", teamwork: "Teamwork", highFive: "High five",
+    cocoonMode: "Cocoon mode", slowMorning: "Slow morning", bigYawn: "One more yawn", foundBalance: "Found the balance",
+    almostReady: "Almost ready", nailedIt: "Nailed it", showtime: "Showtime", victoryDance: "Victory dance",
+    companionsFooter: "© 2026 Lutz R. Frank · Sleep Companions are coming with Yawn Sleep 1.2."
   },
   de: {
-    navLabel: "Hauptnavigation", support: "Support", privacy: "Datenschutz", appStore: "App Store",
+    navLabel: "Hauptnavigation", companions: "Companions", support: "Support", privacy: "Datenschutz", appStore: "App Store",
     homeDescription: "Support- und Datenschutzinformationen für Yawn Sleep auf iPhone und Apple Watch.",
     homeTitle: "Yawn Sleep — Schlaf auf einen Blick", heroTitle: "Schlaf auf einen Blick.",
     heroLead: "Yawn Sleep macht aus der letzten Nacht einen freundlichen Blickfang. Ein weiches 3D-Bett und der kleine Schlafbegleiter reagieren auf deinen lokal berechneten Yawn Score.",
@@ -35,7 +43,15 @@ const translations = {
     appStoreTitle: "Bereit für einen besseren Morgen?", appStoreText: "Lade Yawn Sleep kostenlos für iPhone und Apple Watch.", viewAppStore: "Im App Store ansehen →",
     homeFooter: "© 2026 Lutz R. Frank · Yawn Sleep ist eine unabhängige App und nicht mit Apple verbunden.",
     supportDescription: "Support für die Yawn Sleep App auf iPhone und Apple Watch.", supportTitle: "Yawn Sleep Support",
-    privacyDescription: "Datenschutzerklärung für die Yawn Sleep App auf iPhone und Apple Watch.", privacyTitle: "Yawn Sleep Datenschutzerklärung"
+    privacyDescription: "Datenschutzerklärung für die Yawn Sleep App auf iPhone und Apple Watch.", privacyTitle: "Yawn Sleep Datenschutzerklärung",
+    companionsDescription: "Ein erster Blick auf die neuen Sleep Companions in Yawn Sleep 1.2.", companionsTitle: "Sleep Companions — Bald in Yawn Sleep",
+    comingSoon: "Bald in Yawn Sleep 1.2", companionsEyebrow: "Die Morgen-Crew", companionsHero: "Jede Nacht hat ihren Charakter.",
+    companionsLead: "Lerne einige der Sleep Companions kennen, die aus deiner letzten Nacht eine kleine Morgengeschichte machen.",
+    galleryLabel: "Vorschaugalerie der Sleep Companions", galleryNote: "Eine handverlesene Vorschau – manche Morgen sind ruhig, manche chaotisch und einige einfach besser zu zweit.",
+    asleepTogether: "Gemeinsam weg", pillowTrouble: "Kissenchaos", teamwork: "Teamwork", highFive: "High Five",
+    cocoonMode: "Kokon-Modus", slowMorning: "Langsamer Morgen", bigYawn: "Noch ein Gähnen", foundBalance: "Balance gefunden",
+    almostReady: "Fast bereit", nailedIt: "Läuft", showtime: "Showtime", victoryDance: "Siegestanz",
+    companionsFooter: "© 2026 Lutz R. Frank · Die Sleep Companions kommen mit Yawn Sleep 1.2."
   }
 };
 

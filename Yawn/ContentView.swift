@@ -152,28 +152,77 @@ struct ContentView: View {
 private struct MorningSceneChoice {
     let variant: Int
     let showsLady: Bool
+    let showsDuo: Bool
 
     static func random() -> Self {
-        Self(
-            variant: Int.random(in: 0..<4),
-            showsLady: Int.random(in: 0..<10) == 0
+        let specialVariant = Int.random(in: 0..<20)
+        return Self(
+            variant: Int.random(in: 0..<7),
+            showsLady: specialVariant < 2,
+            showsDuo: specialVariant == 2
         )
     }
 
     func sceneAssetName(for state: BedState) -> String? {
-        if showsLady, state == .refreshed {
-            return "SceneLadyJump"
+        if showsDuo {
+            return switch state {
+            case .exhausted: "SceneDuoExhausted"
+            case .restless: "SceneDuoRestless"
+            case .okay: "SceneDuoOkay"
+            case .refreshed: "SceneDuoRefreshed"
+            }
+        }
+
+        if showsLady {
+            return switch state {
+            case .exhausted: "SceneLadySleepy"
+            case .restless: "SceneLadyYawning"
+            case .okay: "SceneLadyMakeBed"
+            case .refreshed: "SceneLadyJump"
+            }
         }
 
         return switch state {
         case .exhausted:
-            [nil, "SceneExhaustedSlide", "SceneExhaustedHidden", "SceneExhaustedEdgeSit"][variant]
+            [
+                nil,
+                "SceneExhaustedSlide",
+                "SceneExhaustedHidden",
+                "SceneExhaustedEdgeSit",
+                "SceneExhaustedFaceDown",
+                "SceneExhaustedCocoon",
+                "SceneExhaustedSlumped"
+            ][variant]
         case .restless:
-            [nil, "SceneRestlessPillow", "SceneRestlessTangle", "SceneRestlessPillowHug"][variant]
+            [
+                nil,
+                "SceneRestlessPillow",
+                "SceneRestlessTangle",
+                "SceneRestlessPillowHug",
+                "SceneRestlessTangledLeg",
+                "SceneRestlessPillowStack",
+                "SceneRestlessEyeRub"
+            ][variant]
         case .okay:
-            [nil, "SceneOkayStretch", "SceneOkayMakeBed", "SceneOkayWave"][variant]
+            [
+                nil,
+                "SceneOkayStretch",
+                "SceneOkayMakeBed",
+                "SceneOkayWave",
+                "SceneOkayShoulderStretch",
+                "SceneOkayFoldBlanket",
+                "SceneOkayThumbsUp"
+            ][variant]
         case .refreshed:
-            [nil, "SceneRefreshedJump", "SceneRefreshedVictory", "SceneRefreshedCape"][variant]
+            [
+                nil,
+                "SceneRefreshedJump",
+                "SceneRefreshedVictory",
+                "SceneRefreshedCape",
+                "SceneRefreshedBalance",
+                "SceneRefreshedPresentBed",
+                "SceneRefreshedDance"
+            ][variant]
         }
     }
 }
