@@ -1,8 +1,8 @@
-# Yawn Sleep 1.3 – Deutsch
+# Yawn Sleep 1.2 – Deutsch
 
 ## Was ist neu?
 
-Deine Nächte im Rückblick: Mit Version 1.3 kannst du deine Schlafprotokolle für die letzte Woche, den letzten Monat oder das letzte Jahr ansehen.
+Deine Nächte im Rückblick: Mit Version 1.2 kannst du deine Schlafprotokolle für die letzte Woche, den letzten Monat oder das letzte Jahr ansehen.
 
 Außerdem neu:
 
@@ -17,9 +17,9 @@ Wie immer werden deine Schlafdaten ausschließlich auf deinem Gerät verarbeitet
 
 Jetzt mit Schlafprotokollen für Woche, Monat und Jahr: Entdecke deinen Schlafrhythmus und teile deine Übersicht als Text oder PDF – privat und lokal.
 
-## Review-Hinweis zu Version 1.3
+## Review-Hinweis zu Version 1.2
 
-Version 1.3 adds a sleep log for the last week, month, or year. The log contains only locally calculated summary values and can be shared as plain text or as a locally generated PDF; PDFs can also be printed using the system print sheet.
+Version 1.2 adds a sleep log for the last week, month, or year. The log contains only locally calculated summary values and can be shared as plain text or as a locally generated PDF; PDFs can also be printed using the system print sheet.
 
 The new Current Sleep Pattern view calculates the user's typical bedtime and wake time from up to the last 14 recorded nights. Apple does not expose the Sleep Schedule configured in Health to third-party apps, so this view is derived exclusively from recorded Sleep Analysis samples.
 
