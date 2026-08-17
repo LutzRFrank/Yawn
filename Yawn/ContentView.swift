@@ -1,4 +1,6 @@
 import SwiftUI
+import UIKit
+import CoreText
 
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -6,6 +8,8 @@ struct ContentView: View {
     @State private var healthMessage: String?
     @State private var showsWelcome = false
     @State private var showsDiagnostics = false
+    @State private var showsLogs = false
+    @State private var showsSchedule = false
     @State private var sceneChoice = MorningSceneChoice.random()
     @AppStorage("hasSeenWelcome") private var hasSeenWelcome = false
 #if DEBUG
@@ -57,7 +61,7 @@ struct ContentView: View {
                             title: String(localized: "Bettzeit"),
                             value: "\(displayedSleep.bedtimePoints)/30",
                             detail: displayedSleep.bedtimeText,
-                            color: .cyan
+                            color: .blue
                         )
                         SleepMetricCard(
                             title: String(localized: "Ruhe"),
@@ -87,6 +91,22 @@ struct ContentView: View {
                         Image(systemName: "doc.text.magnifyingglass")
                     }
                     .accessibilityLabel("Diagnosebericht anzeigen")
+
+                    Menu {
+                        Button {
+                            showsLogs = true
+                        } label: {
+                            Label("Schlafprotokolle", systemImage: "calendar")
+                        }
+                        Button {
+                            showsSchedule = true
+                        } label: {
+                            Label("Aktueller Schlafrhythmus", systemImage: "bed.double")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel("Weitere Schlafdetails")
 
 #if DEBUG
                     Button {
@@ -145,6 +165,12 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showsDiagnostics) {
             DiagnosticReportView(sleep: displayedSleep)
+        }
+        .sheet(isPresented: $showsLogs) {
+            SleepLogView()
+        }
+        .sheet(isPresented: $showsSchedule) {
+            SleepScheduleView()
         }
     }
 }
@@ -431,7 +457,7 @@ private struct SleepMetricCard: View {
 
             Text(detail)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary.opacity(0.78))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -439,7 +465,7 @@ private struct SleepMetricCard: View {
         .padding(12)
         .background(
             LinearGradient(
-                colors: [color.opacity(0.16), color.opacity(0.07)],
+                colors: [color.opacity(0.32), color.opacity(0.16)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
@@ -447,8 +473,169 @@ private struct SleepMetricCard: View {
         )
         .overlay {
             RoundedRectangle(cornerRadius: 18)
-                .stroke(color.opacity(0.22), lineWidth: 0.8)
+                .stroke(color.opacity(0.5), lineWidth: 1)
         }
+    }
+}
+
+private enum LogPeriod: String, CaseIterable, Identifiable {
+    case week, month, year
+    var id: Self { self }
+    var days: Int { switch self { case .week: 7; case .month: 31; case .year: 366 } }
+    var title: String {
+        switch self {
+        case .week: String(localized: "Woche")
+        case .month: String(localized: "Monat")
+        case .year: String(localized: "Jahr")
+        }
+    }
+}
+
+private struct SleepLogView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var period: LogPeriod = .week
+    @State private var history: [SleepSummary] = []
+    @State private var errorMessage: String?
+
+    private var entries: [SleepSummary] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -period.days, to: .now) ?? .distantPast
+        return Array(history.filter { $0.bedtime >= cutoff }.reversed())
+    }
+
+    private var reportText: String {
+        let rows = entries.map {
+            "\($0.bedtime.formatted(date: .abbreviated, time: .omitted))\t\($0.score)\t\($0.sleepDurationText)\t\($0.bedtimeText)\t\($0.interruptionText)"
+        }
+        let average = entries.isEmpty ? 0 : entries.reduce(0) { $0 + $1.score } / entries.count
+        return ([String(localized: "Yawn Schlafprotokoll") + " — \(period.title)",
+                 String(localized: "Durchschnittlicher Score") + ": \(average)", "",
+                 String(localized: "Datum\tScore\tDauer\tBettzeit\tRuhe")] + rows).joined(separator: "\n")
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Picker("Zeitraum", selection: $period) {
+                    ForEach(LogPeriod.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
+
+                if let errorMessage {
+                    ContentUnavailableView(errorMessage, systemImage: "heart.slash")
+                } else if history.isEmpty {
+                    ProgressView()
+                        .frame(maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        Text(reportText)
+                            .font(.system(.footnote, design: .monospaced))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
+                    HStack {
+                        ShareLink(item: reportText) {
+                            Label("Text teilen", systemImage: "doc.plaintext")
+                        }
+                        .buttonStyle(.bordered)
+
+                        if let pdfURL = SleepReportFile.pdf(text: reportText, name: period.title) {
+                            ShareLink(item: pdfURL) {
+                                Label("PDF teilen", systemImage: "doc.richtext")
+                            }
+                            .buttonStyle(.borderedProminent)
+
+                            Button {
+                                UIPrintInteractionController.shared.printingItem = pdfURL
+                                UIPrintInteractionController.shared.present(animated: true)
+                            } label: {
+                                Image(systemName: "printer")
+                            }
+                            .buttonStyle(.bordered)
+                            .accessibilityLabel("Protokoll drucken")
+                        }
+                    }
+                }
+            }
+            .padding(20)
+            .background(Color(red: 0.965, green: 0.945, blue: 0.91))
+            .navigationTitle("Schlafprotokolle")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fertig") { dismiss() } } }
+        }
+        .task {
+            do { history = try await SleepHealthStore.shared.sleepHistory() }
+            catch { errorMessage = String(localized: "Schlafdaten konnten nicht geladen werden.") }
+        }
+    }
+}
+
+private struct SleepScheduleView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var history: [SleepSummary] = []
+
+    private var recent: ArraySlice<SleepSummary> { history.suffix(14) }
+    private func averageTime(_ dates: [Date]) -> String {
+        guard !dates.isEmpty else { return "–" }
+        let calendar = Calendar.current
+        let minutes = dates.map { Double(calendar.component(.hour, from: $0) * 60 + calendar.component(.minute, from: $0)) }
+        let angles = minutes.map { $0 / 1440 * 2 * Double.pi }
+        let angle = atan2(angles.reduce(0) { $0 + sin($1) }, angles.reduce(0) { $0 + cos($1) })
+        let normalized = angle < 0 ? angle + 2 * .pi : angle
+        let total = Int((normalized / (2 * .pi) * 1440).rounded()) % 1440
+        let date = calendar.date(bySettingHour: total / 60, minute: total % 60, second: 0, of: .now) ?? .now
+        return date.formatted(date: .omitted, time: .shortened)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Aus den letzten 14 Nächten") {
+                    LabeledContent("Übliche Bettzeit", value: averageTime(recent.map(\.bedtime)))
+                    LabeledContent("Übliche Aufstehzeit", value: averageTime(recent.map(\.wakeTime)))
+                    LabeledContent("Erfasste Nächte", value: "\(recent.count)")
+                }
+                Section {
+                    Text("Apple stellt die in Health konfigurierte Schlafplan-Einstellung Apps nicht zur Verfügung. Diese Zeiten sind deshalb aus deinen zuletzt aufgezeichneten Schlafdaten berechnet.")
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle("Aktueller Schlafrhythmus")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fertig") { dismiss() } } }
+        }
+        .task { history = (try? await SleepHealthStore.shared.sleepHistory(days: 30)) ?? [] }
+    }
+}
+
+private enum SleepReportFile {
+    static func pdf(text: String, name: String) -> URL? {
+        let safeName = name.replacingOccurrences(of: "/", with: "-")
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("Yawn-\(safeName).pdf")
+        let renderer = UIGraphicsPDFRenderer(bounds: CGRect(x: 0, y: 0, width: 595, height: 842))
+        do {
+            try renderer.writePDF(to: url) { context in
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .font: UIFont.monospacedSystemFont(ofSize: 10, weight: .regular),
+                    .foregroundColor: UIColor.label
+                ]
+                let attributed = NSAttributedString(string: text, attributes: attributes)
+                var offset = 0
+                while offset < attributed.length {
+                    context.beginPage()
+                    let frame = CGRect(x: 42, y: 42, width: 511, height: 758)
+                    let setter = CTFramesetterCreateWithAttributedString(attributed)
+                    let path = CGPath(rect: frame, transform: nil)
+                    let range = CFRange(location: offset, length: 0)
+                    let pdfFrame = CTFramesetterCreateFrame(setter, range, path, nil)
+                    CTFrameDraw(pdfFrame, context.cgContext)
+                    let visible = CTFrameGetVisibleStringRange(pdfFrame)
+                    guard visible.length > 0 else { break }
+                    offset += visible.length
+                }
+            }
+            return url
+        } catch { return nil }
     }
 }
 

@@ -38,6 +38,7 @@ struct SleepSummary: Sendable {
     let score: Int
     let totalSleep: TimeInterval
     let bedtime: Date
+    let wakeTime: Date
     let bedtimeConsistency: TimeInterval
     let awake: TimeInterval
     let interruptionCount: Int
@@ -88,6 +89,7 @@ struct SleepSummary: Sendable {
         score: 84,
         totalSleep: 7.5 * 3600,
         bedtime: previewBedtime(hour: 23, minute: 10),
+        wakeTime: previewBedtime(hour: 7, minute: 0),
         bedtimeConsistency: 30 * 60,
         awake: 25 * 60,
         interruptionCount: 2
@@ -97,6 +99,7 @@ struct SleepSummary: Sendable {
         score: 30,
         totalSleep: 4.75 * 3600,
         bedtime: previewBedtime(hour: 2, minute: 5),
+        wakeTime: previewBedtime(hour: 6, minute: 50),
         bedtimeConsistency: 2 * 3600,
         awake: 95 * 60,
         interruptionCount: 7

@@ -7,6 +7,13 @@ actor SleepHealthStore {
     private let store = HKHealthStore()
 
     func latestNight(now: Date = .now) async throws -> SleepSummary {
+        guard let latest = try await sleepHistory(days: 14, now: now).last else {
+            throw HealthError.noSleepData
+        }
+        return latest
+    }
+
+    func sleepHistory(days: Int = 370, now: Date = .now) async throws -> [SleepSummary] {
         guard HKHealthStore.isHealthDataAvailable(),
               let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
             throw HealthError.unavailable
@@ -15,7 +22,7 @@ actor SleepHealthStore {
         try await store.requestAuthorization(toShare: [], read: [sleepType])
 
         let calendar = Calendar.current
-        let start = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+        let start = calendar.date(byAdding: .day, value: -days, to: now) ?? now
         let predicate = HKQuery.predicateForSamples(
             withStart: start,
             end: now,
@@ -49,38 +56,36 @@ actor SleepHealthStore {
             .merged()
             .groupedIntoSleepSessions()
             .filter { $0.totalSleep >= 2 * 3600 }
-        guard let latestNight = nights.last else {
+        guard !nights.isEmpty else {
             throw HealthError.noSleepData
         }
 
-        let bedtime = latestNight.start
-        let sleepWindow = DateInterval(start: bedtime, end: latestNight.end)
-        let interruptions = awakeIntervals
-            .compactMap { $0.intersection(with: sleepWindow) }
-            .merged()
-            // Apple does not treat sub-minute awake samples as reportable
-            // interruptions. Ignoring them also prevents one brief transition
-            // between sleep stages from inflating both count and awake time.
-            .filter { $0.duration >= 60 }
-        let totalSleep = latestNight.totalSleep
-        let awake = interruptions.reduce(0) { $0 + $1.duration }
-        let interruptionCount = interruptions.eventCount(maximumGap: 2 * 60)
-        // Compare the latest night with up to 13 preceding nights.
-        let bedtimeConsistency = nights.suffix(14).bedtimeConsistency()
-
-        return SleepSummary(
-            score: SleepScore.calculate(
-                totalSleep: totalSleep,
-                bedtimeConsistency: bedtimeConsistency,
+        return nights.enumerated().map { index, night in
+            let sleepWindow = DateInterval(start: night.start, end: night.end)
+            let interruptions = awakeIntervals
+                .compactMap { $0.intersection(with: sleepWindow) }
+                .merged()
+                .filter { $0.duration >= 60 }
+            let awake = interruptions.reduce(0) { $0 + $1.duration }
+            let interruptionCount = interruptions.eventCount(maximumGap: 2 * 60)
+            let comparisonStart = max(0, index - 13)
+            let comparisonNights = Array(nights[comparisonStart...index])
+            let consistency = comparisonNights.bedtimeConsistency()
+            return SleepSummary(
+                score: SleepScore.calculate(
+                    totalSleep: night.totalSleep,
+                    bedtimeConsistency: consistency,
+                    awake: awake,
+                    interruptionCount: interruptionCount
+                ),
+                totalSleep: night.totalSleep,
+                bedtime: night.start,
+                wakeTime: night.end,
+                bedtimeConsistency: consistency,
                 awake: awake,
                 interruptionCount: interruptionCount
-            ),
-            totalSleep: totalSleep,
-            bedtime: bedtime,
-            bedtimeConsistency: bedtimeConsistency,
-            awake: awake,
-            interruptionCount: interruptionCount
-        )
+            )
+        }
     }
 }
 
