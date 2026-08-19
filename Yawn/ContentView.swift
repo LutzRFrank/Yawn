@@ -369,7 +369,7 @@ private struct WelcomeView: View {
                         WelcomeCard(
                             icon: "bed.double.fill",
                             title: String(localized: "Ein Bett mit Gefühl"),
-                            text: String(localized: "Bett und Lil’ Finder Guy zeigen sofort, wie erholsam deine Nacht war.")
+                            text: String(localized: "Bett und dein kleiner Begleiter zeigen sofort, wie erholsam deine Nacht war.")
                         )
                         WelcomeCard(
                             icon: "lock.shield.fill",
