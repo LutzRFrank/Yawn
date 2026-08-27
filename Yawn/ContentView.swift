@@ -2,8 +2,18 @@ import SwiftUI
 import UIKit
 import CoreText
 
+private enum YawnTheme {
+    static let lightBackground = Color(red: 0.965, green: 0.945, blue: 0.91)
+    static let darkBackground = Color(red: 0.055, green: 0.055, blue: 0.065)
+
+    static func background(for colorScheme: ColorScheme) -> Color {
+        colorScheme == .dark ? darkBackground : lightBackground
+    }
+}
+
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     @State private var sleep = SleepSummary.placeholder
     @State private var healthMessage: String?
     @State private var showsWelcome = false
@@ -27,7 +37,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.965, green: 0.945, blue: 0.91)
+                YawnTheme.background(for: colorScheme)
                     .ignoresSafeArea()
 
                 VStack(spacing: 18) {
@@ -318,19 +328,24 @@ private struct MorningSceneView: View {
 }
 
 private struct WelcomeView: View {
+    @Environment(\.colorScheme) private var colorScheme
     let dismiss: () -> Void
+
+    private var backgroundGradient: LinearGradient {
+        LinearGradient(
+            colors: colorScheme == .dark
+                ? [Color(red: 0.035, green: 0.055, blue: 0.12),
+                   Color(red: 0.075, green: 0.105, blue: 0.20)]
+                : [Color(red: 0.96, green: 0.97, blue: 1),
+                   Color(red: 0.88, green: 0.93, blue: 1)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
 
     var body: some View {
         ZStack {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.96, green: 0.97, blue: 1),
-                    Color(red: 0.88, green: 0.93, blue: 1)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            backgroundGradient.ignoresSafeArea()
 
             ScrollView {
                 VStack(spacing: 24) {
@@ -405,6 +420,7 @@ private struct WelcomeView: View {
 }
 
 private struct WelcomeCard: View {
+    @Environment(\.colorScheme) private var colorScheme
     let icon: String
     let title: String
     let text: String
@@ -427,10 +443,18 @@ private struct WelcomeCard: View {
             Spacer(minLength: 0)
         }
         .padding(16)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .background(
+            colorScheme == .dark
+                ? Color.white.opacity(0.08)
+                : Color.white.opacity(0.48),
+            in: RoundedRectangle(cornerRadius: 20)
+        )
         .overlay {
             RoundedRectangle(cornerRadius: 20)
-                .stroke(.white.opacity(0.7), lineWidth: 0.8)
+                .stroke(
+                    Color.white.opacity(colorScheme == .dark ? 0.16 : 0.7),
+                    lineWidth: 0.8
+                )
         }
     }
 }
@@ -493,6 +517,7 @@ private enum LogPeriod: String, CaseIterable, Identifiable {
 
 private struct SleepLogView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     @State private var period: LogPeriod = .week
     @State private var history: [SleepSummary] = []
     @State private var errorMessage: String?
@@ -558,11 +583,14 @@ private struct SleepLogView: View {
                 }
             }
             .padding(20)
-            .background(Color(red: 0.965, green: 0.945, blue: 0.91))
+            .background(YawnTheme.background(for: colorScheme).ignoresSafeArea())
             .navigationTitle("Schlafprotokolle")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(YawnTheme.background(for: colorScheme), for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Fertig") { dismiss() } } }
         }
+        .presentationBackground(YawnTheme.background(for: colorScheme))
         .task {
             do { history = try await SleepHealthStore.shared.sleepHistory() }
             catch { errorMessage = String(localized: "Schlafdaten konnten nicht geladen werden.") }
@@ -641,7 +669,18 @@ private enum SleepReportFile {
 
 private struct DiagnosticReportView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
     let sleep: SleepSummary
+
+    private var backgroundColor: Color {
+        YawnTheme.background(for: colorScheme)
+    }
+
+    private var reportBackgroundColor: Color {
+        colorScheme == .dark
+            ? Color.white.opacity(0.09)
+            : Color.white.opacity(0.42)
+    }
 
     private var versionText: String {
         let version = Bundle.main.object(
@@ -681,10 +720,14 @@ private struct DiagnosticReportView: View {
 
                     Text(reportText)
                         .font(.system(.body, design: .monospaced))
+                        .foregroundStyle(.primary)
                         .textSelection(.enabled)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(16)
-                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18))
+                        .background(
+                            reportBackgroundColor,
+                            in: RoundedRectangle(cornerRadius: 18)
+                        )
 
                     ShareLink(item: reportText) {
                         Label("Bericht teilen", systemImage: "square.and.arrow.up")
@@ -701,9 +744,11 @@ private struct DiagnosticReportView: View {
                 }
                 .padding(24)
             }
-            .background(Color(red: 0.965, green: 0.945, blue: 0.91))
+            .background(backgroundColor.ignoresSafeArea())
             .navigationTitle("Diagnose")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(backgroundColor, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Fertig") {
@@ -712,6 +757,7 @@ private struct DiagnosticReportView: View {
                 }
             }
         }
+        .presentationBackground(backgroundColor)
     }
 }
 
