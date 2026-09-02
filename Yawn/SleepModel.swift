@@ -157,7 +157,11 @@ enum SleepScore {
         case 420..<450:
             points = 46 + (minutes - 420) / 15
             roundingRule = .down
-        case 360..<420:
+        case 395..<420:
+            // Apple rounds the upper part of the six-hour band up by one point.
+            points = 36 + (minutes - 360) / 6
+            roundingRule = .down
+        case 360..<395:
             points = 35 + (minutes - 360) / 6
             roundingRule = .down
         default:
@@ -178,6 +182,13 @@ enum SleepScore {
 
     static func interruptionPoints(awake: TimeInterval, count: Int) -> Int {
         let awakeMinutes = max(0, awake / 60)
+
+        // Match Apple's full-rest boundary using the same rounded minute value
+        // shown to the user in the score card and diagnostic report.
+        if count <= 2, awakeMinutes.rounded() <= 7 {
+            return 20
+        }
+
         let durationPenalty = awakeMinutes / 10
             + max(0, awakeMinutes - 25) / 6
         let rawCountPenalty = Double(max(0, count - 4)) * 2
