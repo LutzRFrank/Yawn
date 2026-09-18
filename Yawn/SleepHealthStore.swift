@@ -65,9 +65,14 @@ actor SleepHealthStore {
             let interruptions = awakeIntervals
                 .compactMap { $0.intersection(with: sleepWindow) }
                 .merged()
+            // Short wake phases affect how often the user woke up, even when
+            // they are too brief to contribute to the displayed awake time.
+            let awake = interruptions
                 .filter { $0.duration >= 60 }
-            let awake = interruptions.reduce(0) { $0 + $1.duration }
-            let interruptionCount = interruptions.eventCount(maximumGap: 2 * 60)
+                .reduce(0) { $0 + $1.duration }
+            let interruptionCount = interruptions
+                .filter { $0.duration >= 30 }
+                .eventCount(maximumGap: 2 * 60)
             let comparisonStart = max(0, index - 13)
             let comparisonNights = Array(nights[comparisonStart...index])
             let consistency = comparisonNights.bedtimeConsistency()
@@ -87,7 +92,62 @@ actor SleepHealthStore {
             )
         }
     }
+
+#if DEBUG
+    func interruptionDiagnostics(for sleep: SleepSummary) async throws -> InterruptionDiagnostics {
+        guard HKHealthStore.isHealthDataAvailable(),
+              let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis) else {
+            throw HealthError.unavailable
+        }
+
+        try await store.requestAuthorization(toShare: [], read: [sleepType])
+
+        let sleepWindow = DateInterval(start: sleep.bedtime, end: sleep.wakeTime)
+        let predicate = HKQuery.predicateForSamples(
+            withStart: sleepWindow.start,
+            end: sleepWindow.end,
+            options: []
+        )
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.categorySample(type: sleepType, predicate: predicate)],
+            sortDescriptors: [SortDescriptor(\.startDate)]
+        )
+        let samples = try await descriptor.result(for: store)
+        let raw = samples.compactMap { sample -> DateInterval? in
+            guard HKCategoryValueSleepAnalysis(rawValue: sample.value) == .awake else {
+                return nil
+            }
+            let interval = DateInterval(start: sample.startDate, end: sample.endDate)
+            guard interval.duration > 0 else { return nil }
+            return interval.intersection(with: sleepWindow)
+        }
+        let merged = raw.merged()
+        let counted = merged.filter { $0.duration >= 30 }
+        let durationIntervals = merged.filter { $0.duration >= 60 }
+        return InterruptionDiagnostics(
+            sleepWindow: sleepWindow,
+            raw: raw,
+            merged: merged,
+            counted: counted,
+            durationIntervals: durationIntervals
+        )
+    }
+#endif
 }
+
+#if DEBUG
+struct InterruptionDiagnostics {
+    let sleepWindow: DateInterval
+    let raw: [DateInterval]
+    let merged: [DateInterval]
+    let counted: [DateInterval]
+    let durationIntervals: [DateInterval]
+
+    func eventCount(maximumGap: TimeInterval) -> Int {
+        counted.eventCount(maximumGap: maximumGap)
+    }
+}
+#endif
 
 private struct SleepSession {
     let intervals: [DateInterval]

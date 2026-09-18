@@ -671,6 +671,11 @@ private struct DiagnosticReportView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     let sleep: SleepSummary
+#if DEBUG
+    @State private var interruptionDiagnostics: InterruptionDiagnostics?
+    @State private var isLoadingInterruptions = false
+    @State private var interruptionError: String?
+#endif
 
     private var backgroundColor: Color {
         YawnTheme.background(for: colorScheme)
@@ -710,6 +715,56 @@ private struct DiagnosticReportView: View {
         )
     }
 
+#if DEBUG
+    private var interruptionDetailText: String {
+        guard let detail = interruptionDiagnostics else { return "" }
+        let clock = Date.FormatStyle.dateTime.day().month().hour().minute().second()
+        func time(_ date: Date) -> String { date.formatted(clock) }
+        func length(_ interval: DateInterval) -> String {
+            "\(Int(interval.duration.rounded())) s"
+        }
+
+        var lines = [
+            "\(String(localized: "Schlaffenster")): \(time(detail.sleepWindow.start)) – \(time(detail.sleepWindow.end))",
+            "\(String(localized: "Rohe Wachintervalle")): \(detail.raw.count)",
+            "\(String(localized: "Nach Überlappungs-Merge")): \(detail.merged.count)",
+            "\(String(localized: "Ab 30 Sekunden (Anzahl)")): \(detail.counted.count)",
+            "\(String(localized: "Ab 60 Sekunden (Wachzeit)")): \(detail.durationIntervals.count)",
+            "\(String(localized: "Ereignisse bei 0/30/60/120 s Abstand")): \(detail.eventCount(maximumGap: 0))/\(detail.eventCount(maximumGap: 30))/\(detail.eventCount(maximumGap: 60))/\(detail.eventCount(maximumGap: 120))",
+            "\(String(localized: "Im Yawn Score gezählt")): \(sleep.interruptionCount)",
+            "",
+            String(localized: "Rohe Intervalle:")
+        ]
+        lines += detail.raw.enumerated().map { index, interval in
+            "\(index + 1). \(time(interval.start)) – \(time(interval.end)) · \(length(interval))"
+        }
+        lines += ["", String(localized: "Nach Überlappungs-Merge:")]
+        lines += detail.merged.enumerated().map { index, interval in
+            let status: String
+            if interval.duration >= 60 {
+                status = String(localized: "Anzahl und Wachzeit")
+            } else if interval.duration >= 30 {
+                status = String(localized: "nur Anzahl")
+            } else {
+                status = String(localized: "unter 30 s – verworfen")
+            }
+            return "\(index + 1). \(time(interval.start)) – \(time(interval.end)) · \(length(interval)) · \(status)"
+        }
+        lines += ["", String(localized: "Gezählte Intervalle und Abstand zum vorigen:")]
+        lines += detail.counted.enumerated().map { index, interval in
+            guard index > 0 else {
+                return "1. \(time(interval.start)) – \(time(interval.end)) · \(length(interval))"
+            }
+            let gap = interval.start.timeIntervalSince(detail.counted[index - 1].end)
+            let decision = gap <= 120
+                ? String(localized: "zusammengefasst")
+                : String(localized: "neues Ereignis")
+            return "\(index + 1). \(time(interval.start)) – \(time(interval.end)) · \(length(interval)) · \(Int(gap.rounded())) s \(String(localized: "Abstand")) → \(decision)"
+        }
+        return lines.joined(separator: "\n")
+    }
+#endif
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -741,6 +796,53 @@ private struct DiagnosticReportView: View {
                     Text("Der Bericht verlässt dein Gerät nur, wenn du ihn ausdrücklich teilst.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+
+#if DEBUG
+                    Divider()
+
+                    Button {
+                        isLoadingInterruptions = true
+                        interruptionError = nil
+                        Task {
+                            do {
+                                interruptionDiagnostics = try await SleepHealthStore.shared
+                                    .interruptionDiagnostics(for: sleep)
+                            } catch {
+                                interruptionError = String(localized: "Wachphasen konnten nicht geladen werden.")
+                            }
+                            isLoadingInterruptions = false
+                        }
+                    } label: {
+                        Label("Wachphasen analysieren", systemImage: "waveform.path.ecg")
+                    }
+                    .disabled(isLoadingInterruptions)
+
+                    if isLoadingInterruptions {
+                        ProgressView()
+                    }
+
+                    if let interruptionError {
+                        Text(interruptionError)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if interruptionDiagnostics != nil {
+                        Text("Nur lokal im Debug-Build; nicht im geteilten Bericht enthalten.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+
+                        Text(interruptionDetailText)
+                            .font(.system(.footnote, design: .monospaced))
+                            .foregroundStyle(.primary)
+                            .textSelection(.enabled)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(16)
+                            .background(
+                                reportBackgroundColor,
+                                in: RoundedRectangle(cornerRadius: 18)
+                            )
+                    }
+#endif
                 }
                 .padding(24)
             }
