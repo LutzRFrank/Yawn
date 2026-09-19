@@ -93,3 +93,7 @@ private struct WatchMorningSceneView: View {
         }
     }
 }
+
+#Preview {
+    WatchContentView()
+}
