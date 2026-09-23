@@ -193,7 +193,10 @@ enum SleepScore {
             + max(0, awakeMinutes - 25) / 6
         let rawCountPenalty = Double(max(0, count - 4)) * 2
         let countPenalty = max(0, rawCountPenalty - (count >= 8 ? 1 : 0))
-        let roundingRule: FloatingPointRoundingRule = count <= 1
+        // Apple rounds the duration-based result to the nearest point when
+        // there are only a few interruptions. With four or more, the count
+        // penalty remains conservative and rounds down.
+        let roundingRule: FloatingPointRoundingRule = count <= 3
             ? .toNearestOrAwayFromZero
             : .down
         return Int(
