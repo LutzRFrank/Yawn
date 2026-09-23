@@ -323,7 +323,7 @@
 				CODE_SIGN_ENTITLEMENTS = Yawn/Yawn.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
@@ -333,7 +333,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = de.lutzfrank.Yawn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -349,7 +349,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Yawn/Yawn.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
@@ -359,7 +359,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = de.lutzfrank.Yawn;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -376,7 +376,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Yawn Watch App/YawnWatch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
@@ -384,7 +384,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Yawn Sleep schreibt keine Gesundheitsdaten. HealthKit wird ausschließlich zum Lesen deiner Schlafphasen für den Yawn Score verwendet.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.lutzfrank.Yawn;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = de.lutzfrank.Yawn.watchkitapp;
 				PRODUCT_NAME = YawnWatch;
 				SDKROOT = watchos;
@@ -402,7 +402,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Yawn Watch App/YawnWatch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Yawn Sleep";
@@ -410,7 +410,7 @@
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "Yawn liest deine Schlafphasen, um dein Bett und deinen Sleep Score anzuzeigen.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Yawn Sleep schreibt keine Gesundheitsdaten. HealthKit wird ausschließlich zum Lesen deiner Schlafphasen für den Yawn Score verwendet.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.lutzfrank.Yawn;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = de.lutzfrank.Yawn.watchkitapp;
 				PRODUCT_NAME = YawnWatch;
 				SDKROOT = watchos;
