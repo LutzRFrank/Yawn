@@ -167,7 +167,9 @@ struct ContentView: View {
                 sceneChoice = .random()
             }
         }
-        .sheet(isPresented: $showsWelcome) {
+        .sheet(isPresented: $showsWelcome, onDismiss: {
+            hasSeenWelcome = true
+        }) {
             WelcomeView {
                 hasSeenWelcome = true
                 showsWelcome = false
