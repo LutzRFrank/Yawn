@@ -32,6 +32,14 @@
 "Nach Überlappungs-Merge" = "After overlap merge";
 "Ab 30 Sekunden (Anzahl)" = "At least 30 seconds (count)";
 "Ab 60 Sekunden (Wachzeit)" = "At least 60 seconds (awake time)";
+"Strikt über 30 Sekunden (Anzahl)" = "Strictly over 30 seconds (count)";
+"Wachzeit gesamt (nach Merge)" = "Total awake time (after merge)";
+"Wachzeit ab 30 Sekunden" = "Awake time at least 30 seconds";
+"Wachzeit ab 60 Sekunden (Yawn)" = "Awake time at least 60 seconds (Yawn)";
+"Datenquellen und Schlafphasen:" = "Data sources and sleep stages:";
+"Wachintervalle mit Quelle und Schlafüberschneidung:" = "Awake intervals with source and asleep overlap:";
+"Schlafüberschneidung" = "Asleep overlap";
+"Am Schlaffenster gekürzt" = "Clipped to sleep window";
 "Ereignisse bei 0/30/60/120 s Abstand" = "Events at 0/30/60/120 s gap";
 "Im Yawn Score gezählt" = "Counted in Yawn Score";
 "Rohe Intervalle:" = "Raw intervals:";

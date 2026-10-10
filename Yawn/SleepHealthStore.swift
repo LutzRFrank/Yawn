@@ -113,6 +113,18 @@ actor SleepHealthStore {
             sortDescriptors: [SortDescriptor(\.startDate)]
         )
         let samples = try await descriptor.result(for: store)
+        let diagnosticSamples = samples.compactMap { sample -> DiagnosticSleepSample? in
+            let interval = DateInterval(start: sample.startDate, end: sample.endDate)
+            guard interval.duration > 0,
+                  let clipped = interval.intersection(with: sleepWindow),
+                  clipped.duration > 0 else { return nil }
+            return DiagnosticSleepSample(
+                interval: clipped,
+                value: sample.value,
+                source: "\(sample.sourceRevision.source.name) [\(sample.sourceRevision.source.bundleIdentifier)]",
+                clipped: clipped != interval
+            )
+        }
         let raw = samples.compactMap { sample -> DateInterval? in
             guard HKCategoryValueSleepAnalysis(rawValue: sample.value) == .awake else {
                 return nil
@@ -129,7 +141,8 @@ actor SleepHealthStore {
             raw: raw,
             merged: merged,
             counted: counted,
-            durationIntervals: durationIntervals
+            durationIntervals: durationIntervals,
+            samples: diagnosticSamples
         )
     }
 #endif
@@ -142,9 +155,45 @@ struct InterruptionDiagnostics {
     let merged: [DateInterval]
     let counted: [DateInterval]
     let durationIntervals: [DateInterval]
+    let samples: [DiagnosticSleepSample]
+
+    var asleepIntervals: [DateInterval] {
+        samples.filter(\.isAsleep).map(\.interval).merged()
+    }
+
+    func asleepOverlap(with interval: DateInterval) -> TimeInterval {
+        asleepIntervals.compactMap { $0.intersection(with: interval) }
+            .reduce(0) { $0 + $1.duration }
+    }
 
     func eventCount(maximumGap: TimeInterval) -> Int {
         counted.eventCount(maximumGap: maximumGap)
+    }
+}
+
+struct DiagnosticSleepSample {
+    let interval: DateInterval
+    let value: Int
+    let source: String
+    let clipped: Bool
+
+    var isAsleep: Bool {
+        switch HKCategoryValueSleepAnalysis(rawValue: value) {
+        case .asleepUnspecified, .asleepCore, .asleepDeep, .asleepREM: true
+        default: false
+        }
+    }
+
+    var stage: String {
+        switch HKCategoryValueSleepAnalysis(rawValue: value) {
+        case .inBed: "in bed"
+        case .asleepUnspecified: "asleep unspecified"
+        case .awake: "awake"
+        case .asleepCore: "core"
+        case .asleepDeep: "deep"
+        case .asleepREM: "REM"
+        default: "unknown (\(value))"
+        }
     }
 }
 #endif

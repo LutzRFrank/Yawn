@@ -189,7 +189,10 @@ enum SleepScore {
             return 20
         }
 
-        let durationPenalty = awakeMinutes / 10
+        // Three-interruption reference nights retain 19 points at 16–17 awake
+        // minutes and drop to 18 at about 20 minutes.
+        let minutesPerPoint = count == 3 ? 12.0 : 10.0
+        let durationPenalty = awakeMinutes / minutesPerPoint
             + max(0, awakeMinutes - 25) / 6
         let rawCountPenalty = Double(max(0, count - 4)) * 2
         let countPenalty = max(0, rawCountPenalty - (count >= 8 ? 1 : 0))

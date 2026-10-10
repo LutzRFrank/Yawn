@@ -32,6 +32,14 @@
 "Nach Überlappungs-Merge" = "Nach Überlappungs-Merge";
 "Ab 30 Sekunden (Anzahl)" = "Ab 30 Sekunden (Anzahl)";
 "Ab 60 Sekunden (Wachzeit)" = "Ab 60 Sekunden (Wachzeit)";
+"Strikt über 30 Sekunden (Anzahl)" = "Strikt über 30 Sekunden (Anzahl)";
+"Wachzeit gesamt (nach Merge)" = "Wachzeit gesamt (nach Merge)";
+"Wachzeit ab 30 Sekunden" = "Wachzeit ab 30 Sekunden";
+"Wachzeit ab 60 Sekunden (Yawn)" = "Wachzeit ab 60 Sekunden (Yawn)";
+"Datenquellen und Schlafphasen:" = "Datenquellen und Schlafphasen:";
+"Wachintervalle mit Quelle und Schlafüberschneidung:" = "Wachintervalle mit Quelle und Schlafüberschneidung:";
+"Schlafüberschneidung" = "Schlafüberschneidung";
+"Am Schlaffenster gekürzt" = "Am Schlaffenster gekürzt";
 "Ereignisse bei 0/30/60/120 s Abstand" = "Ereignisse bei 0/30/60/120 s Abstand";
 "Im Yawn Score gezählt" = "Im Yawn Score gezählt";
 "Rohe Intervalle:" = "Rohe Intervalle:";

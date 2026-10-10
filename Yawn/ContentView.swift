@@ -722,8 +722,15 @@ private struct DiagnosticReportView: View {
         guard let detail = interruptionDiagnostics else { return "" }
         let clock = Date.FormatStyle.dateTime.day().month().hour().minute().second()
         func time(_ date: Date) -> String { date.formatted(clock) }
+        func seconds(_ duration: TimeInterval) -> String {
+            String(format: "%.3f s", locale: Locale(identifier: "en_US_POSIX"), duration)
+        }
         func length(_ interval: DateInterval) -> String {
-            "\(Int(interval.duration.rounded())) s"
+            seconds(interval.duration)
+        }
+        func total(_ intervals: [DateInterval]) -> String {
+            let duration = intervals.reduce(0) { $0 + $1.duration }
+            return "\(seconds(duration)) · \(String(format: "%.3f", locale: Locale(identifier: "en_US_POSIX"), duration / 60)) min"
         }
 
         var lines = [
@@ -732,6 +739,10 @@ private struct DiagnosticReportView: View {
             "\(String(localized: "Nach Überlappungs-Merge")): \(detail.merged.count)",
             "\(String(localized: "Ab 30 Sekunden (Anzahl)")): \(detail.counted.count)",
             "\(String(localized: "Ab 60 Sekunden (Wachzeit)")): \(detail.durationIntervals.count)",
+            "\(String(localized: "Strikt über 30 Sekunden (Anzahl)")): \(detail.merged.filter { $0.duration > 30 }.count)",
+            "\(String(localized: "Wachzeit gesamt (nach Merge)")): \(total(detail.merged))",
+            "\(String(localized: "Wachzeit ab 30 Sekunden")): \(total(detail.counted))",
+            "\(String(localized: "Wachzeit ab 60 Sekunden (Yawn)")): \(total(detail.durationIntervals))",
             "\(String(localized: "Ereignisse bei 0/30/60/120 s Abstand")): \(detail.eventCount(maximumGap: 0))/\(detail.eventCount(maximumGap: 30))/\(detail.eventCount(maximumGap: 60))/\(detail.eventCount(maximumGap: 120))",
             "\(String(localized: "Im Yawn Score gezählt")): \(sleep.interruptionCount)",
             "",
@@ -761,7 +772,22 @@ private struct DiagnosticReportView: View {
             let decision = gap <= 120
                 ? String(localized: "zusammengefasst")
                 : String(localized: "neues Ereignis")
-            return "\(index + 1). \(time(interval.start)) – \(time(interval.end)) · \(length(interval)) · \(Int(gap.rounded())) s \(String(localized: "Abstand")) → \(decision)"
+            return "\(index + 1). \(time(interval.start)) – \(time(interval.end)) · \(length(interval)) · \(seconds(gap)) \(String(localized: "Abstand")) → \(decision)"
+        }
+        lines += ["", String(localized: "Datenquellen und Schlafphasen:")]
+        let bySource = Dictionary(grouping: detail.samples, by: \.source)
+        for source in bySource.keys.sorted() {
+            lines.append(source)
+            let stages = Dictionary(grouping: bySource[source] ?? [], by: \.stage)
+            for stage in stages.keys.sorted() {
+                let samples = stages[stage] ?? []
+                lines.append("  \(stage): \(samples.count) · \(total(samples.map(\.interval)))")
+            }
+        }
+        lines += ["", String(localized: "Wachintervalle mit Quelle und Schlafüberschneidung:")]
+        let awakeSamples = detail.samples.filter { $0.stage == "awake" }
+        lines += awakeSamples.enumerated().map { index, sample in
+            "\(index + 1). \(time(sample.interval.start)) – \(time(sample.interval.end)) · \(length(sample.interval)) · \(sample.source) · \(String(localized: "Schlafüberschneidung")): \(seconds(detail.asleepOverlap(with: sample.interval))) · \(String(localized: "Am Schlaffenster gekürzt")): \(sample.clipped)"
         }
         return lines.joined(separator: "\n")
     }
