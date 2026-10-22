@@ -40,58 +40,11 @@ struct ContentView: View {
                 YawnTheme.background(for: colorScheme)
                     .ignoresSafeArea()
 
-                VStack(spacing: 18) {
-                    Spacer()
-
-                    ArchedYawnTitle()
-
-                    MorningSceneView(
-                        sleep: displayedSleep,
-                        choice: sceneChoice
-                    )
-                    .contentTransition(.opacity)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(displayedSleep.bedState.accessibilityLabel)
-
-                    Text("\(displayedSleep.score)")
-                        .font(.system(size: 48, weight: .bold, design: .rounded))
-                        .foregroundStyle(.indigo)
-                        .contentTransition(.numericText())
-                        .accessibilityLabel("Sleep Score \(displayedSleep.score)")
-                        .offset(y: -8)
-
-                    HStack(spacing: 10) {
-                        SleepMetricCard(
-                            title: String(localized: "Dauer"),
-                            value: "\(displayedSleep.durationPoints)/50",
-                            detail: displayedSleep.sleepDurationText,
-                            color: .indigo
-                        )
-                        SleepMetricCard(
-                            title: String(localized: "Bettzeit"),
-                            value: "\(displayedSleep.bedtimePoints)/30",
-                            detail: displayedSleep.bedtimeText,
-                            color: .blue
-                        )
-                        SleepMetricCard(
-                            title: String(localized: "Ruhe"),
-                            value: "\(displayedSleep.interruptionPoints)/20",
-                            detail: displayedSleep.interruptionText,
-                            color: .orange
-                        )
-                    }
-                    .offset(y: -8)
-
-                    if let healthMessage {
-                        Text(healthMessage)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    Spacer()
-                }
-                .padding(24)
+                SleepDashboardView(
+                    sleep: displayedSleep,
+                    sceneChoice: sceneChoice,
+                    healthMessage: healthMessage
+                )
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
@@ -183,6 +136,107 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showsSchedule) {
             SleepScheduleView()
+        }
+    }
+}
+
+/// Uses the current safe-area size so folding, rotation, and window resizing
+/// all follow the same layout path without identifying a particular device.
+private struct SleepDashboardView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let sleep: SleepSummary
+    let sceneChoice: MorningSceneChoice
+    var healthMessage: String?
+
+    var body: some View {
+        GeometryReader { geometry in
+            let isWide = geometry.size.width >= 600 && !dynamicTypeSize.isAccessibilitySize
+            let contentWidth = min(max(geometry.size.width - 48, 0), 1000)
+
+            ScrollView {
+                Group {
+                    if isWide {
+                        HStack(spacing: 32) {
+                            scene
+                                .frame(width: (contentWidth - 32) * 0.55)
+
+                            VStack(spacing: 18) {
+                                score
+                                metrics(stacked: true)
+                                message
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    } else {
+                        VStack(spacing: 18) {
+                            scene
+                            score
+                            metrics(stacked: dynamicTypeSize.isAccessibilitySize)
+                            message
+                        }
+                        .frame(maxWidth: 420)
+                    }
+                }
+                .frame(maxWidth: contentWidth)
+                .padding(24)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: geometry.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+
+    private var scene: some View {
+        VStack(spacing: 18) {
+            ArchedYawnTitle()
+            MorningSceneView(sleep: sleep, choice: sceneChoice)
+                .contentTransition(.opacity)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(sleep.bedState.accessibilityLabel)
+        }
+    }
+
+    private var score: some View {
+        Text("\(sleep.score)")
+            .font(.system(size: 48, weight: .bold, design: .rounded))
+            .foregroundStyle(.indigo)
+            .contentTransition(.numericText())
+            .accessibilityLabel("Sleep Score \(sleep.score)")
+    }
+
+    private func metrics(stacked: Bool) -> some View {
+        let layout = stacked
+            ? AnyLayout(VStackLayout(spacing: 10))
+            : AnyLayout(HStackLayout(spacing: 10))
+
+        return layout {
+            SleepMetricCard(
+                title: String(localized: "Dauer"),
+                value: "\(sleep.durationPoints)/50",
+                detail: sleep.sleepDurationText,
+                color: .indigo
+            )
+            SleepMetricCard(
+                title: String(localized: "Bettzeit"),
+                value: "\(sleep.bedtimePoints)/30",
+                detail: sleep.bedtimeText,
+                color: .blue
+            )
+            SleepMetricCard(
+                title: String(localized: "Ruhe"),
+                value: "\(sleep.interruptionPoints)/20",
+                detail: sleep.interruptionText,
+                color: .orange
+            )
+        }
+    }
+
+    @ViewBuilder private var message: some View {
+        if let healthMessage {
+            Text(healthMessage)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
     }
 }
@@ -462,6 +516,7 @@ private struct WelcomeCard: View {
 }
 
 private struct SleepMetricCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let title: String
     let value: String
     let detail: String
@@ -475,7 +530,7 @@ private struct SleepMetricCard: View {
                     .frame(width: 7, height: 7)
                 Text(title)
                     .font(.caption2.weight(.semibold))
-                    .lineLimit(1)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
             }
 
             Text(value)
@@ -484,7 +539,7 @@ private struct SleepMetricCard: View {
             Text(detail)
                 .font(.caption2)
                 .foregroundStyle(.primary.opacity(0.78))
-                .lineLimit(1)
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -893,4 +948,22 @@ private struct DiagnosticReportView: View {
 
 #Preview {
     ContentView()
+}
+
+// Preview the layout without triggering Health authorization or onboarding.
+#Preview("Narrow", traits: .fixedLayout(width: 390, height: 760)) {
+    SleepDashboardView(sleep: .placeholder, sceneChoice: .init(variant: 0, showsLady: false, showsDuo: false))
+}
+
+#Preview("Unfolded", traits: .fixedLayout(width: 720, height: 620)) {
+    SleepDashboardView(sleep: .placeholder, sceneChoice: .init(variant: 1, showsLady: false, showsDuo: false))
+}
+
+#Preview("Wide and short", traits: .fixedLayout(width: 800, height: 320)) {
+    SleepDashboardView(sleep: .poorPreview, sceneChoice: .init(variant: 0, showsLady: false, showsDuo: false))
+}
+
+#Preview("Accessibility", traits: .fixedLayout(width: 720, height: 620)) {
+    SleepDashboardView(sleep: .placeholder, sceneChoice: .init(variant: 1, showsLady: false, showsDuo: false))
+        .environment(\.dynamicTypeSize, .accessibility3)
 }

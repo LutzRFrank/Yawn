@@ -29,4 +29,16 @@ The public support site is published from [`docs/`](docs/):
 Open `Yawn.xcodeproj` in Xcode. The project contains the iPhone and Apple Watch
 targets and requires the HealthKit capability.
 
+For full-display iPhone Duo support, build with the iOS 27.1 SDK or later.
+The dashboard adapts to its current safe-area width: at 600 points and above,
+scene and metrics appear side by side; narrower windows use a centered vertical
+layout. Short windows scroll, and accessibility text sizes use stacked cards.
+Portrait and both landscape orientations are supported.
+
+Layout previews in `ContentView.swift` cover narrow, unfolded, short, and large
+text layouts without requesting Health access. Before release, check the Duo
+simulator closed and fully open, rotate in both directions, and fold/unfold with
+the dashboard and each detail sheet visible. Check light/dark appearance and
+accessibility text sizes, including scrolling to the last metric.
+
 © 2026 Lutz R. Frank
