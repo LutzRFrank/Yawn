@@ -98,13 +98,30 @@ struct ContentView: View {
                 }
             }
         }
-        .task {
+        .onOpenURL { url in
+            guard YawnDeepLink.destination(for: url) == .duoMornings else { return }
+            // The event takes place on the dashboard. Keep first-run onboarding.
+            showsDiagnostics = false
+            showsLogs = false
+            showsSchedule = false
+            if hasSeenWelcome {
+                showsWelcome = false
+            }
+#if DEBUG
+            showsPoorPreview = false
+#endif
+        }
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
             do {
                 let summary = try await SleepHealthStore.shared.latestNight()
+                // A backgrounded request must not overwrite a newer refresh.
+                try Task.checkCancellation()
                 sleep = summary
                 WatchScoreSync.shared.send(score: summary.score)
                 healthMessage = nil
             } catch {
+                guard !Task.isCancelled else { return }
                 healthMessage = String(
                     localized: "Health-Zugriff erlauben, um die letzte Nacht anzuzeigen."
                 )

@@ -1,8 +1,20 @@
-# App Review Notes — Yawn Sleep 1.3 (19)
+# App Review Notes — Yawn Sleep 1.3.1 (20)
 
 Yawn Sleep is an iPhone app with an embedded Apple Watch companion app.
 
-Version 1.3 adds basic support for the full, open iPhone Duo display. The main
+Version 1.3.1 adds a custom URL scheme for direct access to the main dashboard:
+`yawnsleep://events/duo-mornings`. This is the destination for the proposed
+Duo Mornings In-App Event. It opens the existing dashboard and dismisses open
+detail sheets; it does not add timed content, rewards, or special event modes.
+First-launch onboarding and Health permission requirements remain in place.
+Other routes and URLs with queries, fragments, or credentials are ignored.
+
+To test, install this build, paste the URL into Notes, and tap the link. Test
+both with the app closed and with a detail sheet open. On first launch, complete
+the introduction to reach the dashboard. The sleep summary also refreshes when
+the app returns to the foreground.
+
+Version 1.3 added basic support for the full, open iPhone Duo display. The main
 dashboard responds to the available safe-area size: wide windows place the
 morning scene beside the score and its three metric cards, while narrow windows
 use a vertical layout. Portrait and both landscape orientations are supported.

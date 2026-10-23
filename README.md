@@ -41,4 +41,9 @@ simulator closed and fully open, rotate in both directions, and fold/unfold with
 the dashboard and each detail sheet visible. Check light/dark appearance and
 accessibility text sizes, including scrolling to the last metric.
 
+Version 1.3.1 adds `yawnsleep://events/duo-mornings`, opening the main dashboard.
+URL registration is in `Configuration/Yawn-Info.plist`; routing is validated in
+`Yawn/YawnDeepLink.swift`. This link requires version 1.3.1 or later and is not
+supported by version 1.3. First-run onboarding is preserved.
+
 © 2026 Lutz R. Frank
