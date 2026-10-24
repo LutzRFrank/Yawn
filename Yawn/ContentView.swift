@@ -178,7 +178,7 @@ private struct SleepDashboardView: View {
                                 .frame(width: (contentWidth - 32) * 0.55)
 
                             VStack(spacing: 18) {
-                                score
+                                wideScore
                                 metrics(stacked: true)
                                 message
                             }
@@ -219,6 +219,21 @@ private struct SleepDashboardView: View {
             .foregroundStyle(.indigo)
             .contentTransition(.numericText())
             .accessibilityLabel("Sleep Score \(sleep.score)")
+    }
+
+    private var wideScore: some View {
+        score
+            .frame(maxWidth: .infinity)
+            .frame(height: 80)
+            .overlay(alignment: .trailing) {
+                Image(sleep.bedState.characterAssetName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 72, height: 80)
+                    .contentTransition(.opacity)
+                    .accessibilityHidden(true)
+                    .allowsHitTesting(false)
+            }
     }
 
     private func metrics(stacked: Bool) -> some View {
@@ -973,6 +988,10 @@ private struct DiagnosticReportView: View {
 }
 
 #Preview("Unfolded", traits: .fixedLayout(width: 720, height: 620)) {
+    SleepDashboardView(sleep: .placeholder, sceneChoice: .init(variant: 1, showsLady: false, showsDuo: false))
+}
+
+#Preview("Unfolded minimum width", traits: .fixedLayout(width: 600, height: 620)) {
     SleepDashboardView(sleep: .placeholder, sceneChoice: .init(variant: 1, showsLady: false, showsDuo: false))
 }
 
